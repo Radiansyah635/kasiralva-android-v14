@@ -110,15 +110,15 @@ class LicenseManager(private val context: Context) {
                                 result = "OK"
                                 latch.countDown()
                             }
-                            .addOnFailureListener {
-                                result = "ERROR"
+                            .addOnFailureListener { e ->
+                                result = "ERROR:${e.javaClass.simpleName}:${e.message}"
                                 latch.countDown()
                             }
                     }
                 }
             }
-            .addOnFailureListener {
-                result = "NETWORK_ERROR"
+            .addOnFailureListener { e ->
+                result = "NETWORK_ERROR:${e.javaClass.simpleName}:${e.message}"
                 latch.countDown()
             }
 

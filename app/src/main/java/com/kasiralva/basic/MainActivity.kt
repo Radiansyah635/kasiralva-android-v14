@@ -71,7 +71,12 @@ class MainActivity : ComponentActivity() {
                     "NETWORK_ERROR"
                 }
                 runOnUiThread {
-                    val safe = result.replace("'", "")
+                    val safe = result
+                        .replace("\\", "")
+                        .replace("'", "")
+                        .replace("\n", " ")
+                        .replace("\r", " ")
+                        .take(300)
                     webView.evaluateJavascript(
                         "window.KasirAlvaOnlineActivationResult && window.KasirAlvaOnlineActivationResult('$safe')",
                         null

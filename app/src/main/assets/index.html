@@ -2941,14 +2941,16 @@ window.KasirAlvaOnlineActivationResult = function(result) {
   if (result === "OK") {
     msg.textContent = "Aktivasi berhasil.";
     setTimeout(function(){ location.reload(); }, 600);
-  } else if (result === "SERVER_404") {
-    msg.textContent = "Kode lisensi tidak ditemukan.";
-  } else if (result === "SERVER_409") {
+  } else if (result === "SERVER_404" || result === "INVALID") {
+    msg.textContent = "Kode lisensi tidak ditemukan / format salah.";
+  } else if (result === "SERVER_409" || result === "USED") {
     msg.textContent = "Lisensi sudah terikat ke perangkat lain.";
-  } else if (result === "NETWORK_ERROR") {
-    msg.textContent = "Server tidak dapat dihubungi. Periksa koneksi internet.";
+  } else if (result === "REVOKED") {
+    msg.textContent = "Lisensi tidak aktif (revoked).";
+  } else if (result.indexOf("NETWORK_ERROR") === 0 || result.indexOf("ERROR") === 0) {
+    msg.textContent = "Aktivasi gagal: " + result;
   } else {
-    msg.textContent = "Aktivasi gagal. Silakan periksa kode lisensi.";
+    msg.textContent = "Aktivasi gagal. Silakan periksa kode lisensi. (" + result + ")";
   }
 };
 </script>
