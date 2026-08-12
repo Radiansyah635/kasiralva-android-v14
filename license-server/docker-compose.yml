@@ -1,0 +1,9 @@
+services:
+  license-server:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      KASIRALVA_ADMIN_TOKEN: ${KASIRALVA_ADMIN_TOKEN}
+    volumes:
+      - ./data:/app/data

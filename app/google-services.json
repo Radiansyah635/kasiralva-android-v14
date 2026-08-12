@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "344874905630",
+    "project_id": "kasiralva-5c89e",
+    "storage_bucket": "kasiralva-5c89e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:344874905630:android:e5c3d61a145c17a081be0f",
+        "android_client_info": {
+          "package_name": "com.kasiralva.basic"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSykbpe_27EzoMWgg4TWyuJ9DGtOkABDI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

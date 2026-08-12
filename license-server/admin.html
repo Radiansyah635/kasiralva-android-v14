@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KasirAlva License Admin</title>
+<style>
+body{font-family:system-ui;margin:0;background:#f4f5f7;color:#171717}
+header{background:#111;color:#fff;padding:18px}
+main{max-width:1100px;margin:20px auto;padding:0 14px}
+.card{background:#fff;border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 3px 16px #0001}
+input,button{padding:10px;border-radius:9px;border:1px solid #ccc;font:inherit}
+button{cursor:pointer;font-weight:700}
+.primary{background:#111;color:#fff}
+.danger{background:#fff;color:#b00020;border-color:#e0a0a0}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+table{width:100%;border-collapse:collapse;margin-top:12px}
+th,td{padding:9px;border-bottom:1px solid #eee;text-align:left;font-size:14px}
+code{font-weight:700}
+#msg{margin-top:10px;color:#555}
+</style>
+</head>
+<body>
+<header><strong>KasirAlva — License Admin</strong></header>
+<main>
+<div class="card">
+  <h2>Admin Login</h2>
+  <div class="row">
+    <input id="token" type="password" placeholder="Admin token" style="min-width:280px">
+    <button class="primary" onclick="load()">Masuk / Refresh</button>
+  </div>
+  <div id="msg"></div>
+</div>
+
+<div class="card">
+  <h2>Generate Kode</h2>
+  <div class="row">
+    <input id="qty" type="number" min="1" max="1000" value="10">
+    <button class="primary" onclick="generate()">Generate</button>
+  </div>
+  <pre id="generated">Belum ada kode.</pre>
+</div>
+
+<div class="card">
+  <h2>Daftar Lisensi</h2>
+  <button onclick="load()">Refresh</button>
+  <table>
+    <thead><tr><th>Lisensi</th><th>Status</th><th>Perangkat</th><th>Dibuat</th><th>Aktif</th><th>Aksi</th></tr></thead>
+    <tbody id="list"></tbody>
+  </table>
+</div>
+</main>
+<script>
+function token(){return document.getElementById('token').value}
+function msg(x){document.getElementById('msg').textContent=x}
+async function api(url,options={}){
+  options.headers=Object.assign({'Content-Type':'application/json','X-Admin-Token':token()},options.headers||{});
+  const r=await fetch(url,options);
+  let x={}; try{x=await r.json()}catch(e){}
+  if(!r.ok) throw new Error(x.detail||('HTTP '+r.status));
+  return x;
+}
+async function generate(){
+  try{
+    const q=Math.max(1,Math.min(1000,+document.getElementById('qty').value||1));
+    const x=await api('/admin/generate?admin_token='+encodeURIComponent(token()),{
+      method:'POST',body:JSON.stringify({quantity:q})
+    });
+    document.getElementById('generated').textContent=x.licenses.join('\n');
+    msg(x.count+' kode berhasil dibuat.');
+    load();
+  }catch(e){msg(e.message)}
+}
+async function load(){
+  try{
+    const x=await api('/admin/licenses?admin_token='+encodeURIComponent(token()));
+    const body=document.getElementById('list');
+    body.innerHTML='';
+    x.licenses.forEach(v=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML='<td><code>'+esc(v.license_key)+'</code></td>'+
+        '<td>'+esc(v.status)+'</td>'+
+        '<td>'+esc(v.device_hash||'-')+'</td>'+
+        '<td>'+esc(v.created_at||'-')+'</td>'+
+        '<td>'+esc(v.activated_at||'-')+'</td>'+
+        '<td><button class="danger" onclick="revokeKey('+JSON.stringify(v.license_key)+')">Revoke</button></td>';
+      body.appendChild(tr);
+    });
+    msg(x.licenses.length+' lisensi ditemukan.');
+  }catch(e){msg(e.message)}
+}
+async function revokeKey(key){
+  if(!confirm('Revoke lisensi '+key+'?')) return;
+  try{
+    await api('/admin/revoke?admin_token='+encodeURIComponent(token()),{
+      method:'POST',body:JSON.stringify({license_key:key,device_hash:''})
+    });
+    msg('Lisensi berhasil direvoke.');
+    load();
+  }catch(e){msg(e.message)}
+}
+function esc(v){return String(v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+</script>
+</body>
+</html>
