@@ -6,6 +6,8 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.print.PrintAttributes
+import android.print.PrintManager
 import android.webkit.JavascriptInterface
 import android.webkit.PermissionRequest
 import android.webkit.WebChromeClient
@@ -428,6 +430,22 @@ class MainActivity : ComponentActivity() {
                     type = "application/json"
                 }
                 startActivityForResult(intent, restoreBackupCode)
+            }
+        }
+
+        // ------------------------------------------------------------------
+        // Print (struk & laporan) via Android Print Framework.
+        // WebView tidak mendukung window.print() bawaan browser, jadi
+        // dibungkus lewat PrintManager di sini.
+        // ------------------------------------------------------------------
+
+        @JavascriptInterface
+        fun printPage(jobName: String) {
+            runOnUiThread {
+                val printManager = getSystemService(PRINT_SERVICE) as PrintManager
+                val safeName = if (jobName.isBlank()) "KasirAlva Document" else jobName
+                val adapter = webView.createPrintDocumentAdapter(safeName)
+                printManager.print(safeName, adapter, PrintAttributes.Builder().build())
             }
         }
 

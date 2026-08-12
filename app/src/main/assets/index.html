@@ -288,12 +288,12 @@
       background: #fff;
       border: 1px solid #e9ecef;
       border-radius: 10px;
-      padding: 10px;
+      padding: 6px;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      min-height: 120px;
+      min-height: 60px;
       transition: transform 0.1s, box-shadow 0.15s;
     }
     .product-card:active { transform: scale(0.97); }
@@ -301,7 +301,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 6px;
+      margin-bottom: 3px;
     }
     .stock-badge {
       background: #e8f5e9;
@@ -324,14 +324,14 @@
       text-overflow: ellipsis;
     }
     .product-name {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
       color: #222;
-      margin-bottom: 8px;
-      height: 34px;
+      margin-bottom: 4px;
+      height: 16px;
       overflow: hidden;
       display: -webkit-box;
-      -webkit-line-clamp: 2;
+      -webkit-line-clamp: 1;
       -webkit-box-orient: vertical;
     }
     .product-bottom {
@@ -1007,8 +1007,8 @@
       }
       .pos-cart {
         flex: 0 0 auto;
-        max-height: 42%;
-        min-height: 200px;
+        max-height: 55%;
+        min-height: 220px;
       }
       .product-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -1018,7 +1018,7 @@
     @media (max-width: 480px) {
       .product-grid { grid-template-columns: 1fr 1fr; }
       .header-sub { display: none; }
-      .pos-cart { max-height: 38%; min-height: 180px; }
+      .pos-cart { max-height: 55%; min-height: 220px; }
     }
   </style>
 
@@ -1567,8 +1567,9 @@
       </div>
       <div id="scanner-reader"></div>
       <div class="scanner-hint">Arahkan kamera ke barcode produk</div>
+      <div id="scanner-last-item" style="text-align:center;font-size:13px;color:var(--success);min-height:18px;margin:4px 0;"></div>
       <div class="scanner-actions">
-        <button class="btn-stop-scan" onclick="closeScanner()">Tutup</button>
+        <button class="btn-stop-scan" onclick="closeScanner()">Selesai</button>
         <button class="btn-manual-barcode" onclick="promptManualBarcode()">
           <i class="fas fa-keyboard"></i> Input Manual
         </button>
@@ -1828,6 +1829,10 @@
 
     // ===================== BARCODE SCANNER =====================
     function openScanner() {
+      lastScannedCode = null;
+      lastScannedAt = 0;
+      const lastItemEl = document.getElementById("scanner-last-item");
+      if (lastItemEl) lastItemEl.textContent = "";
       document.getElementById("scanner-modal").classList.add("show");
       startScanner();
     }
@@ -1886,11 +1891,25 @@
       }
     }
 
+    let lastScannedCode = null;
+    let lastScannedAt = 0;
+
     function onScanSuccess(decodedText) {
-      // Prevent multiple triggers
-      stopScanner();
+      const now = Date.now();
+      // Cegah barcode sama ter-scan berkali-kali dalam waktu singkat
+      if (decodedText === lastScannedCode && now - lastScannedAt < 2000) {
+        return;
+      }
+      lastScannedCode = decodedText;
+      lastScannedAt = now;
       handleBarcode(decodedText);
-      closeScanner();
+
+      const lastItemEl = document.getElementById("scanner-last-item");
+      if (lastItemEl) {
+        lastItemEl.textContent = "✓ Terakhir discan: " + decodedText;
+      }
+      // Kamera tetap menyala untuk scan barang berikutnya.
+      // Tutup manual pakai tombol "Selesai" kalau sudah selesai belanja.
     }
 
     function onScanFailure(error) {
@@ -2321,7 +2340,11 @@
       printArea.style.display = "block";
 
       setTimeout(() => {
-        window.print();
+        if (window.KasirAlvaNative && window.KasirAlvaNative.printPage) {
+          window.KasirAlvaNative.printPage("Struk KasirAlva");
+        } else {
+          window.print();
+        }
         printArea.style.display = "none";
         printArea.innerHTML = "";
       }, 150);
@@ -2738,7 +2761,11 @@
       printArea.style.display = "block";
 
       setTimeout(() => {
-        window.print();
+        if (window.KasirAlvaNative && window.KasirAlvaNative.printPage) {
+          window.KasirAlvaNative.printPage("Laporan KasirAlva");
+        } else {
+          window.print();
+        }
         printArea.style.display = "none";
         printArea.innerHTML = "";
       }, 200);
