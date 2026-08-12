@@ -85,7 +85,7 @@ class LicenseManager(private val context: Context) {
 
                 when {
                     status != "ACTIVE" -> {
-                        result = "REVOKED"
+                        result = "REVOKED:status=[$status]len${status.length}"
                         latch.countDown()
                     }
                     existingHash.isNotEmpty() && existingHash != hash -> {

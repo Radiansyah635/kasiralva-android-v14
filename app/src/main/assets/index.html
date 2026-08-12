@@ -69,7 +69,8 @@
     badge.textContent = "KasirAlva • Basic Offline";
     badge.setAttribute("aria-label", "KasirAlva Basic Offline");
     badge.style.cssText =
-      "position:fixed;right:10px;bottom:10px;z-index:99999;" +
+      "position:fixed;right:10px;z-index:250;" +
+      "bottom:calc(56px + env(safe-area-inset-bottom, 0px) + 10px);" +
       "padding:6px 10px;border-radius:999px;font:600 11px system-ui,sans-serif;" +
       "background:#111;color:#fff;opacity:.82;pointer-events:none;";
     document.body.appendChild(badge);
@@ -1475,6 +1476,24 @@
             <div style="flex:1;">
               <div class="setting-title">Lihat Data Tersimpan</div>
               <div class="setting-sub">Cek jumlah produk, transaksi & ukuran data</div>
+            </div>
+            <i class="fas fa-chevron-right" style="color:#aaa;"></i>
+          </div>
+
+          <div class="setting-card" style="cursor:pointer;" onclick="window.KasirAlvaBackup.backup()">
+            <i class="fas fa-save" style="font-size:22px;color:#1565C0;"></i>
+            <div style="flex:1;">
+              <div class="setting-title">Backup (Pilih Lokasi Simpan)</div>
+              <div class="setting-sub">Simpan file cadangan langsung ke folder pilihan Anda</div>
+            </div>
+            <i class="fas fa-chevron-right" style="color:#aaa;"></i>
+          </div>
+
+          <div class="setting-card" style="cursor:pointer;" onclick="window.KasirAlvaBackup.restore()">
+            <i class="fas fa-recycle" style="font-size:22px;color:var(--success);"></i>
+            <div style="flex:1;">
+              <div class="setting-title">Restore (Pilih File Backup)</div>
+              <div class="setting-sub">Pulihkan data dari file cadangan yang dipilih</div>
             </div>
             <i class="fas fa-chevron-right" style="color:#aaa;"></i>
           </div>
@@ -2903,34 +2922,6 @@
     init();
   </script>
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  if (!window.KasirAlvaNative) return;
-
-  var box = document.createElement("div");
-  box.style.cssText =
-    "position:fixed;left:10px;bottom:10px;z-index:99998;display:flex;gap:6px;" +
-    "font-family:system-ui,sans-serif";
-
-  var b1 = document.createElement("button");
-  b1.textContent = "💾 Backup";
-  b1.onclick = function () { window.KasirAlvaBackup.backup(); };
-
-  var b2 = document.createElement("button");
-  b2.textContent = "♻️ Restore";
-  b2.onclick = function () { window.KasirAlvaBackup.restore(); };
-
-  [b1,b2].forEach(function (b) {
-    b.style.cssText =
-      "border:0;border-radius:8px;padding:8px 10px;background:#111;color:#fff;" +
-      "font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.18)";
-  });
-
-  box.appendChild(b1);
-  box.appendChild(b2);
-  document.body.appendChild(box);
-});
-</script>
 
 
 <script>
@@ -2945,8 +2936,8 @@ window.KasirAlvaOnlineActivationResult = function(result) {
     msg.textContent = "Kode lisensi tidak ditemukan / format salah.";
   } else if (result === "SERVER_409" || result === "USED") {
     msg.textContent = "Lisensi sudah terikat ke perangkat lain.";
-  } else if (result === "REVOKED") {
-    msg.textContent = "Lisensi tidak aktif (revoked).";
+  } else if (result.indexOf("REVOKED") === 0) {
+    msg.textContent = "Lisensi tidak aktif: " + result;
   } else if (result.indexOf("NETWORK_ERROR") === 0 || result.indexOf("ERROR") === 0) {
     msg.textContent = "Aktivasi gagal: " + result;
   } else {

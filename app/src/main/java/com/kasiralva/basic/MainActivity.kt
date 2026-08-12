@@ -1,14 +1,20 @@
 package com.kasiralva.basic
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.webkit.JavascriptInterface
+import android.webkit.PermissionRequest
+import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.kasiralva.basic.data.*
 import kotlinx.coroutines.Dispatchers
@@ -25,6 +31,27 @@ class MainActivity : ComponentActivity() {
     private val createBackupCode = 1001
     private val restoreBackupCode = 1002
 
+    // Menyimpan permission request dari WebView (getUserMedia) sambil menunggu
+    // hasil dialog izin kamera Android.
+    private var pendingWebPermissionRequest: PermissionRequest? = null
+
+    private val requestCameraPermission = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        val req = pendingWebPermissionRequest
+        pendingWebPermissionRequest = null
+        if (req == null) return@registerForActivityResult
+        if (granted) {
+            req.grant(req.resources)
+        } else {
+            req.deny()
+        }
+    }
+
+    private fun hasCameraPermission(): Boolean =
+        ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) ==
+            PackageManager.PERMISSION_GRANTED
+
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +62,18 @@ class MainActivity : ComponentActivity() {
             settings.cacheMode = WebSettings.LOAD_DEFAULT
             settings.mediaPlaybackRequiresUserGesture = false
             webViewClient = WebViewClient()
+            webChromeClient = object : WebChromeClient() {
+                override fun onPermissionRequest(request: PermissionRequest) {
+                    runOnUiThread {
+                        if (hasCameraPermission()) {
+                            request.grant(request.resources)
+                        } else {
+                            pendingWebPermissionRequest = request
+                            requestCameraPermission.launch(Manifest.permission.CAMERA)
+                        }
+                    }
+                }
+            }
             addJavascriptInterface(AppBridge(), "KasirAlvaNative")
         }
         webView.loadUrl("file:///android_asset/index.html")
@@ -42,6 +81,7 @@ class MainActivity : ComponentActivity() {
     }
 
     inner class AppBridge {
+
 
         // ------------------------------------------------------------------
         // License (Firestore)
