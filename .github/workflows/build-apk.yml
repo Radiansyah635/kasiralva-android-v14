@@ -23,12 +23,22 @@ jobs:
       - name: Decode Keystore
         run: |
           echo "${{ secrets.KASIRALVA_KEYSTORE_BASE64 }}" | base64 --decode > app/release.keystore
+          echo "${{ secrets.KASIRALVA_KEYSTORE_BASE64 }}" | base64 --decode > app/kasiralva-release.keystore
 
       - name: Build Android Release
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          
+          # Alias/Variabel umum lainnya
+          STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          RELEASE_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          
+          RELEASE_STORE_FILE: release.keystore
+          KEYSTORE_FILE: release.keystore
         run: |
           ./gradlew assembleRelease
 
