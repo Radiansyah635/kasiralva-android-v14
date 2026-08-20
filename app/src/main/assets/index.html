@@ -568,28 +568,142 @@
     .opname-card {
       background: #fff;
       border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px;
+      border-radius: 12px;
+      padding: 14px;
       margin-bottom: 10px;
     }
     .opname-top {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 6px;
+      align-items: flex-start;
+      margin-bottom: 8px;
+      gap: 8px;
     }
-    .opname-name { font-size: 13px; font-weight: bold; }
-    .opname-date { font-size: 10px; color: #888; }
+    .opname-name { font-size: 14px; font-weight: 700; color: #222; }
+    .opname-date { font-size: 11px; color: #999; white-space: nowrap; }
     .opname-grid {
       display: flex;
-      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
       background: #f8f9fa;
-      padding: 8px;
-      border-radius: 6px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .opname-grid .selisih-neg { color: var(--primary); }
+    .opname-grid .selisih-pos { color: var(--success); }
+    .opname-note { font-size: 12px; color: #666; margin-bottom: 8px; line-height: 1.4; }
+    .opname-del-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #ffebee;
+      color: var(--primary);
+      border: none;
+      border-radius: 16px;
+      padding: 5px 12px;
       font-size: 12px;
       font-weight: 600;
-      margin-bottom: 6px;
+      cursor: pointer;
     }
-    .opname-note { font-size: 11px; color: #666; font-style: italic; }
+    .opname-toolbar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    .opname-toolbar .search-input {
+      flex: 1;
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 10px 14px 10px 36px;
+      font-size: 13px;
+      background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='M21 21l-4.35-4.35'/%3E%3C/svg%3E") no-repeat 12px center;
+      outline: none;
+    }
+    .opname-toolbar .search-input:focus { border-color: var(--primary); }
+    .opname-icon-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+    .opname-icon-btn.print { background: var(--primary); color: #fff; }
+    .opname-icon-btn.trash { background: #fff; color: #666; border: 1px solid #e0e0e0; }
+
+    /* Batch Opname Modal */
+    .batch-opname-hint {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 12px;
+      line-height: 1.45;
+    }
+    .batch-search {
+      width: 100%;
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 10px 14px 10px 36px;
+      font-size: 13px;
+      margin-bottom: 12px;
+      background: #fafafa url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='M21 21l-4.35-4.35'/%3E%3C/svg%3E") no-repeat 12px center;
+      outline: none;
+    }
+    .batch-search:focus { border-color: var(--primary); background-color: #fff; }
+    .batch-table-wrap {
+      max-height: 280px;
+      overflow-y: auto;
+      border: 1px solid #eee;
+      border-radius: 10px;
+      margin-bottom: 14px;
+    }
+    .batch-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .batch-table thead th {
+      position: sticky;
+      top: 0;
+      background: #f8f9fa;
+      text-align: left;
+      padding: 10px 12px;
+      font-weight: 600;
+      color: #555;
+      border-bottom: 1px solid #eee;
+      font-size: 12px;
+    }
+    .batch-table thead th:nth-child(2),
+    .batch-table thead th:nth-child(3) { text-align: center; }
+    .batch-table tbody td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #f3f3f3;
+      vertical-align: middle;
+    }
+    .batch-table tbody tr:last-child td { border-bottom: none; }
+    .batch-prod-name { font-weight: 700; color: #222; }
+    .batch-prod-unit { font-size: 11px; color: #999; margin-top: 2px; }
+    .batch-sys { text-align: center; font-weight: 600; color: #555; }
+    .batch-fisik-input {
+      width: 72px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 7px 8px;
+      font-size: 13px;
+      text-align: center;
+      outline: none;
+      display: block;
+      margin: 0 auto;
+    }
+    .batch-fisik-input:focus { border-color: var(--primary); }
+    .batch-fisik-input::placeholder { color: #bbb; }
 
     /* Reports */
     .report-grid {
@@ -1377,6 +1491,11 @@
               <i class="fas fa-clipboard-check"></i> Opname Baru
             </button>
           </div>
+          <div class="opname-toolbar">
+            <input type="text" class="search-input" id="opname-search" placeholder="Cari produk / catatan..." oninput="renderOpnames()" />
+            <button class="opname-icon-btn print" title="Cetak" onclick="printOpnames()"><i class="fas fa-print"></i></button>
+            <button class="opname-icon-btn trash" title="Hapus semua" onclick="clearAllOpnames()"><i class="fas fa-trash"></i></button>
+          </div>
           <div id="opname-list"></div>
         </div>
       </div>
@@ -1452,48 +1571,33 @@
       <div id="tab-settings" class="tab-content">
         <div class="tab-inner">
           <div class="section-title">Pengaturan Toko</div>
-          <div class="section-sub" style="margin-bottom:14px;">Informasi, backup & keamanan</div>
+          <div class="section-sub" style="margin-bottom:14px;">Informasi, backup &amp; keamanan</div>
 
-          <!-- Edit Nama Toko -->
-          <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;">
+          <!-- Info Toko + Password -->
+          <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px;">
             <div class="modal-label">Nama Toko</div>
             <input type="text" class="modal-input" id="setting-store-name" placeholder="Nama toko" style="margin-bottom:10px;" />
             <div class="modal-label">Alamat Toko</div>
             <input type="text" class="modal-input" id="setting-store-addr" placeholder="Alamat toko" style="margin-bottom:10px;" />
-            <div class="modal-label">Ganti Password Owner (kosongkan = tidak ganti)</div>
-            <input type="password" class="modal-input" id="setting-owner-password" placeholder="Password Owner baru" style="margin-bottom:6px;" />
-            <p style="font-size:11px;color:#888;margin:0 0 10px;">Melindungi menu Inventaris &amp; Toko. Default: 1234</p>
-            <button class="btn-primary" style="width:100%;justify-content:center;" onclick="saveStoreSettings()">
+            <div class="modal-label">Ganti Password Owner</div>
+            <input type="password" class="modal-input" id="setting-owner-password" placeholder="Isi password baru (kosongkan = tidak diganti)" style="margin-bottom:6px;" />
+            <p style="font-size:11px;color:#888;margin:0 0 12px;line-height:1.4;">Melindungi menu Inventaris &amp; Toko. Setelah diganti, Anda harus login ulang.</p>
+            <button class="btn-primary" style="width:100%;justify-content:center;margin-bottom:10px;" onclick="saveStoreSettings()">
               <i class="fas fa-save"></i> Simpan Pengaturan Toko
+            </button>
+            <button type="button" onclick="lockOwnerMenu()" style="width:100%;background:#fff;border:1.5px solid #ddd;border-radius:10px;padding:12px;font-size:13px;font-weight:600;color:#555;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+              <i class="fas fa-lock"></i> Kunci Kembali Menu Owner
             </button>
           </div>
 
-          <!-- Data Management -->
-          <div class="section-title" style="font-size:14px;margin:16px 0 10px;">Manajemen Data</div>
+          <!-- Manajemen Data (simple) -->
+          <div class="section-title" style="font-size:15px;margin:8px 0 12px;">Manajemen Data</div>
 
           <div class="setting-card" style="cursor:pointer;" onclick="showDataInfo()">
             <i class="fas fa-database" style="font-size:22px;color:var(--primary);"></i>
             <div style="flex:1;">
               <div class="setting-title">Lihat Data Tersimpan</div>
-              <div class="setting-sub">Cek jumlah produk, transaksi & ukuran data</div>
-            </div>
-            <i class="fas fa-chevron-right" style="color:#aaa;"></i>
-          </div>
-
-          <div class="setting-card" style="cursor:pointer;" onclick="window.KasirAlvaBackup.backup()">
-            <i class="fas fa-save" style="font-size:22px;color:#1565C0;"></i>
-            <div style="flex:1;">
-              <div class="setting-title">Backup (Pilih Lokasi Simpan)</div>
-              <div class="setting-sub">Simpan file cadangan langsung ke folder pilihan Anda</div>
-            </div>
-            <i class="fas fa-chevron-right" style="color:#aaa;"></i>
-          </div>
-
-          <div class="setting-card" style="cursor:pointer;" onclick="window.KasirAlvaBackup.restore()">
-            <i class="fas fa-recycle" style="font-size:22px;color:var(--success);"></i>
-            <div style="flex:1;">
-              <div class="setting-title">Restore (Pilih File Backup)</div>
-              <div class="setting-sub">Pulihkan data dari file cadangan yang dipilih</div>
+              <div class="setting-sub">Jumlah produk, transaksi, opname &amp; ukuran data</div>
             </div>
             <i class="fas fa-chevron-right" style="color:#aaa;"></i>
           </div>
@@ -1502,7 +1606,7 @@
             <i class="fas fa-download" style="font-size:22px;color:#1565C0;"></i>
             <div style="flex:1;">
               <div class="setting-title">Export / Backup Data</div>
-              <div class="setting-sub">Unduh file JSON untuk cadangan</div>
+              <div class="setting-sub">Unduh file JSON cadangan ke perangkat</div>
             </div>
             <i class="fas fa-chevron-right" style="color:#aaa;"></i>
           </div>
@@ -1521,12 +1625,12 @@
             <i class="fas fa-trash-alt" style="font-size:22px;color:#F57C00;"></i>
             <div style="flex:1;">
               <div class="setting-title">Hapus Riwayat Transaksi</div>
-              <div class="setting-sub">Bersihkan transaksi saja (produk aman)</div>
+              <div class="setting-sub">Hapus transaksi saja — produk &amp; stok aman</div>
             </div>
             <i class="fas fa-chevron-right" style="color:#aaa;"></i>
           </div>
 
-          <button class="btn-reset" onclick="resetData()" style="margin-top:16px;">
+          <button class="btn-reset" onclick="resetData()" style="margin-top:8px;">
             <i class="fas fa-redo"></i> Reset Semua Data ke Demo Awal
           </button>
         </div>
@@ -1581,25 +1685,25 @@
   <div class="modal-overlay" id="password-modal">
     <div class="modal" style="max-width:360px;">
       <div class="modal-header">
-        <div class="modal-title">Password Owner</div>
+        <div class="modal-title">Akses Owner</div>
         <button class="modal-close" onclick="closeModal('password-modal')">&times;</button>
       </div>
-      <div class="modal-label">Masukkan Password Owner untuk membuka menu ini</div>
-      <input type="password" class="modal-input" id="owner-password-input" placeholder="Password Owner" onkeydown="if(event.key==='Enter')checkOwnerPassword()" />
-      <p style="font-size:11px;color:#888;margin:-6px 0 12px;">Default: <b>1234</b> — melindungi Inventaris &amp; Toko</p>
-      <button class="btn-confirm" onclick="checkOwnerPassword()">BUKA</button>
+      <div class="modal-label" style="margin-bottom:10px;">Masukkan password owner untuk membuka menu Inventaris &amp; Toko</div>
+      <input type="password" class="modal-input" id="owner-password-input" placeholder="Password owner" onkeydown="if(event.key==='Enter')checkOwnerPassword()" style="border:1.5px solid var(--primary);" />
+      <p style="font-size:12px;color:#888;margin:-4px 0 14px;line-height:1.4;">Password dapat diganti di menu Toko setelah berhasil masuk.</p>
+      <button class="btn-confirm" onclick="checkOwnerPassword()">BUKA AKSES</button>
     </div>
   </div>
 
   <!-- Data Info Modal -->
   <div class="modal-overlay" id="data-info-modal">
-    <div class="modal" style="max-width:400px;">
+    <div class="modal" style="max-width:380px;">
       <div class="modal-header">
         <div class="modal-title">Data Tersimpan</div>
         <button class="modal-close" onclick="closeModal('data-info-modal')">&times;</button>
       </div>
-      <div id="data-info-content" style="font-size:13px;line-height:1.8;"></div>
-      <button class="btn-confirm" style="margin-top:12px;" onclick="closeModal('data-info-modal')">TUTUP</button>
+      <div id="data-info-content"></div>
+      <button class="btn-confirm" style="margin-top:16px;" onclick="closeModal('data-info-modal')">TUTUP</button>
     </div>
   </div>
 
@@ -1723,20 +1827,35 @@
     </div>
   </div>
 
-  <!-- Opname Modal -->
+  <!-- Opname Modal (Batch) -->
   <div class="modal-overlay" id="opname-modal">
-    <div class="modal">
+    <div class="modal" style="max-width:440px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;">
       <div class="modal-header">
-        <div class="modal-title">Stok Opname Gudang</div>
+        <div class="modal-title">Opname Stok (Batch)</div>
         <button class="modal-close" onclick="closeModal('opname-modal')">&times;</button>
       </div>
-      <div class="modal-label">Pilih Produk</div>
-      <div class="opname-select-list" id="opname-product-list"></div>
-      <div class="modal-label">Jumlah Stok Fisik Sebenarnya</div>
-      <input type="number" class="modal-input" id="opname-actual" placeholder="Masukkan hasil hitung fisik..." />
-      <div class="modal-label">Catatan / Keterangan Selisih</div>
-      <input type="text" class="modal-input" id="opname-note" placeholder="Misal: Barang rusak, hilang, dll" />
-      <button class="btn-confirm" onclick="saveOpname()">SIMPAN & UPDATE STOK</button>
+      <div style="overflow-y:auto;flex:1;padding-right:2px;">
+        <div class="batch-opname-hint">
+          Isi stok fisik hanya untuk produk yang dihitung.<br>
+          Kosongkan yang tidak diopname.
+        </div>
+        <input type="text" class="batch-search" id="batch-opname-search" placeholder="Cari produk di daftar..." oninput="filterBatchOpnameList()" />
+        <div class="batch-table-wrap">
+          <table class="batch-table">
+            <thead>
+              <tr>
+                <th>Produk</th>
+                <th style="width:70px;">Sistem</th>
+                <th style="width:90px;">Fisik</th>
+              </tr>
+            </thead>
+            <tbody id="batch-opname-body"></tbody>
+          </table>
+        </div>
+        <div class="modal-label">Catatan (opsional, berlaku untuk semua yang disimpan)</div>
+        <input type="text" class="modal-input" id="opname-note" placeholder="Misal: Opname gudang 20 Agu 2026" style="margin-bottom:4px;" />
+      </div>
+      <button class="btn-confirm" style="margin-top:12px;" onclick="saveOpname()">SIMPAN &amp; UPDATE STOK</button>
     </div>
   </div>
 
@@ -2477,80 +2596,199 @@
     }
 
     // ===================== OPNAME =====================
+    function getFilteredOpnames() {
+      const q = (document.getElementById("opname-search")?.value || "").trim().toLowerCase();
+      if (!q) return opnames;
+      return opnames.filter(op =>
+        (op.productName || "").toLowerCase().includes(q) ||
+        (op.note || "").toLowerCase().includes(q)
+      );
+    }
+
     function renderOpnames() {
       const list = document.getElementById("opname-list");
-      if (opnames.length === 0) {
-        list.innerHTML = `<div class="empty-state"><i class="fas fa-clipboard-list"></i><div>Belum ada riwayat opname</div></div>`;
+      const filtered = getFilteredOpnames();
+      if (filtered.length === 0) {
+        list.innerHTML = `<div class="empty-state"><i class="fas fa-clipboard-list"></i><div>${opnames.length === 0 ? "Belum ada riwayat opname" : "Tidak ada hasil pencarian"}</div></div>`;
         return;
       }
-      list.innerHTML = opnames.map(op => `
+      list.innerHTML = filtered.map(op => {
+        const actual = op.actualStock != null ? op.actualStock : op.physicalStock;
+        const diff = op.difference != null ? op.difference : (actual - op.systemStock);
+        const diffClass = diff < 0 ? "selisih-neg" : (diff > 0 ? "selisih-pos" : "");
+        const diffText = (diff > 0 ? "+" : "") + diff;
+        return `
         <div class="opname-card">
           <div class="opname-top">
-            <div class="opname-name">${op.productName}</div>
-            <div class="opname-date">${op.date}</div>
+            <div class="opname-name">${op.productName || "-"}</div>
+            <div class="opname-date">${op.date || ""}</div>
           </div>
           <div class="opname-grid">
             <span>Sistem: ${op.systemStock}</span>
-            <span>Fisik: ${op.actualStock}</span>
-            <span style="color:${op.difference < 0 ? 'var(--primary)' : 'var(--success)'}">
-              Selisih: ${op.difference > 0 ? "+" : ""}${op.difference}
-            </span>
+            <span>Fisik: ${actual}</span>
+            <span class="${diffClass}">Selisih: ${diffText}</span>
           </div>
-          <div class="opname-note">Catatan: ${op.note}</div>
-        </div>
-      `).join("");
+          ${op.note ? `<div class="opname-note">Catatan: ${op.note}</div>` : ""}
+          <button class="opname-del-btn" onclick="deleteOpname('${op.id}')"><i class="fas fa-trash"></i> Hapus</button>
+        </div>`;
+      }).join("");
     }
 
     function openOpnameModal() {
-      selectedOpnameProductId = products[0]?.id || null;
-      document.getElementById("opname-actual").value = "";
+      batchOpnameDraft = {};
       document.getElementById("opname-note").value = "";
-      const list = document.getElementById("opname-product-list");
-      list.innerHTML = products.map(p => `
-        <div class="opname-select-item ${selectedOpnameProductId === p.id ? 'selected' : ''}" onclick="selectOpnameProduct('${p.id}')">
-          <span>${p.name}</span>
-          <span style="color:#777">Sistem: ${p.stock} ${p.unit}</span>
-        </div>
-      `).join("");
+      const searchEl = document.getElementById("batch-opname-search");
+      if (searchEl) searchEl.value = "";
+      renderBatchOpnameList();
       document.getElementById("opname-modal").classList.add("show");
     }
 
-    function selectOpnameProduct(id) {
-      selectedOpnameProductId = id;
-      document.querySelectorAll(".opname-select-item").forEach(el => el.classList.remove("selected"));
-      event.currentTarget.classList.add("selected");
+    // Simpan nilai fisik sementara saat filter agar tidak hilang
+    let batchOpnameDraft = {};
+
+    function captureBatchDraft() {
+      document.querySelectorAll("#batch-opname-body .batch-fisik-input").forEach(inp => {
+        const id = inp.getAttribute("data-product-id");
+        if (id) batchOpnameDraft[id] = inp.value;
+      });
+    }
+
+    function renderBatchOpnameList() {
+      captureBatchDraft();
+      const q = (document.getElementById("batch-opname-search")?.value || "").trim().toLowerCase();
+      const body = document.getElementById("batch-opname-body");
+      const list = q
+        ? products.filter(p => (p.name || "").toLowerCase().includes(q) || (p.barcode || "").toLowerCase().includes(q))
+        : products;
+      if (list.length === 0) {
+        body.innerHTML = `<tr><td colspan="3" style="text-align:center;color:#999;padding:20px;">Tidak ada produk</td></tr>`;
+        return;
+      }
+      body.innerHTML = list.map(p => {
+        const draft = batchOpnameDraft[p.id] != null ? batchOpnameDraft[p.id] : "";
+        return `
+        <tr data-pid="${p.id}">
+          <td>
+            <div class="batch-prod-name">${p.name}</div>
+            <div class="batch-prod-unit">${p.unit || "pcs"}</div>
+          </td>
+          <td class="batch-sys">${p.stock}</td>
+          <td>
+            <input type="number" class="batch-fisik-input" data-product-id="${p.id}" data-system="${p.stock}" placeholder="—" min="0" inputmode="numeric" value="${draft}" />
+          </td>
+        </tr>`;
+      }).join("");
+    }
+
+    function filterBatchOpnameList() {
+      renderBatchOpnameList();
     }
 
     function saveOpname() {
-      if (!selectedOpnameProductId || document.getElementById("opname-actual").value === "") {
-        showToast("Pilih produk dan masukkan stok fisik!");
+      // Ambil semua draft termasuk yang sedang tidak tampil karena filter
+      captureBatchDraft();
+      const note = (document.getElementById("opname-note").value || "").trim();
+      const now = new Date().toISOString().replace("T", " ").substring(0, 19);
+      const ts = Date.now();
+      let saved = 0;
+      let idx = 0;
+
+      Object.keys(batchOpnameDraft).forEach(productId => {
+        const val = String(batchOpnameDraft[productId] || "").trim();
+        if (val === "") return;
+        const actual = parseInt(val, 10);
+        if (isNaN(actual) || actual < 0) return;
+
+        const product = products.find(p => p.id === productId);
+        if (!product) return;
+
+        const systemStock = product.stock;
+        const diff = actual - systemStock;
+
+        opnames.unshift({
+          id: "op-" + ts + "-" + idx,
+          productId: product.id,
+          productName: product.name,
+          systemStock: systemStock,
+          actualStock: actual,
+          physicalStock: actual,
+          difference: diff,
+          note: note || "Opname stok batch",
+          date: now,
+          createdAt: ts
+        });
+
+        product.stock = actual;
+        saved++;
+        idx++;
+      });
+
+      if (saved === 0) {
+        showToast("Isi minimal 1 stok fisik untuk disimpan");
         return;
       }
-      const product = products.find(p => p.id === selectedOpnameProductId);
-      const actual = parseInt(document.getElementById("opname-actual").value) || 0;
-      const diff = actual - product.stock;
-      const note = document.getElementById("opname-note").value || "Koreksi Stok Opname Gudang";
-
-      const newOp = {
-        id: "op-" + Date.now(),
-        productId: product.id,
-        productName: product.name,
-        systemStock: product.stock,
-        actualStock: actual,
-        difference: diff,
-        note,
-        date: new Date().toISOString().replace("T", " ").substring(0, 19)
-      };
-
-      opnames.unshift(newOp);
-      product.stock = actual;
 
       saveState();
       closeModal("opname-modal");
       renderOpnames();
       renderPosProducts();
+      if (typeof renderProducts === "function") renderProducts();
       updateLowStockAlert();
-      showToast("Stok Opname Berhasil Disimpan & Disinkronkan!");
+      showToast(saved + " produk berhasil di-opname & stok diupdate!");
+    }
+
+    function deleteOpname(id) {
+      if (!confirm("Hapus data opname ini?")) return;
+      opnames = opnames.filter(o => o.id !== id);
+      saveState();
+      renderOpnames();
+      showToast("Data opname dihapus");
+    }
+
+    function clearAllOpnames() {
+      if (opnames.length === 0) {
+        showToast("Tidak ada data opname");
+        return;
+      }
+      if (!confirm("Hapus SEMUA riwayat opname? Stok produk tidak berubah.")) return;
+      opnames = [];
+      saveState();
+      renderOpnames();
+      showToast("Semua riwayat opname dihapus");
+    }
+
+    function printOpnames() {
+      const filtered = getFilteredOpnames();
+      if (filtered.length === 0) {
+        showToast("Tidak ada data untuk dicetak");
+        return;
+      }
+      const storeName = (storeSettings && storeSettings.name) || "KasirAlva Mart";
+      let rows = filtered.map(op => {
+        const actual = op.actualStock != null ? op.actualStock : op.physicalStock;
+        const diff = op.difference != null ? op.difference : (actual - op.systemStock);
+        return `<tr>
+          <td style="padding:6px;border-bottom:1px solid #ddd;">${op.productName}</td>
+          <td style="padding:6px;border-bottom:1px solid #ddd;text-align:center;">${op.systemStock}</td>
+          <td style="padding:6px;border-bottom:1px solid #ddd;text-align:center;">${actual}</td>
+          <td style="padding:6px;border-bottom:1px solid #ddd;text-align:center;">${diff > 0 ? "+" : ""}${diff}</td>
+          <td style="padding:6px;border-bottom:1px solid #ddd;font-size:11px;">${op.note || "-"}</td>
+          <td style="padding:6px;border-bottom:1px solid #ddd;font-size:11px;">${op.date || ""}</td>
+        </tr>`;
+      }).join("");
+      const w = window.open("", "_blank", "width=800,height=600");
+      w.document.write(`<!DOCTYPE html><html><head><title>Laporan Opname</title>
+        <style>body{font-family:sans-serif;padding:20px;} h2{margin:0 0 4px;} table{width:100%;border-collapse:collapse;font-size:13px;} th{background:#f0f0f0;padding:8px;text-align:left;border-bottom:2px solid #ccc;}</style>
+        </head><body>
+        <h2>${storeName}</h2>
+        <p style="color:#666;margin:0 0 16px;">Laporan Stok Opname & Audit — ${new Date().toLocaleString("id-ID")}</p>
+        <table>
+          <thead><tr><th>Produk</th><th>Sistem</th><th>Fisik</th><th>Selisih</th><th>Catatan</th><th>Tanggal</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+        <script>window.onload=function(){window.print();}</script>
+        </body></html>`);
+      w.document.close();
     }
 
     // ===================== REPORTS =====================
@@ -2800,26 +3038,35 @@
       applyStoreSettings();
       document.getElementById("setting-owner-password").value = "";
       if (!newPass) showToast("Pengaturan toko disimpan");
+      if (newPass) switchTab("pos");
+    }
+
+    function lockOwnerMenu() {
+      ownerUnlocked = false;
+      showToast("Menu Owner dikunci kembali");
+      switchTab("pos");
     }
 
     function showDataInfo() {
       const prodSize = JSON.stringify(products).length;
       const txSize = JSON.stringify(transactions).length;
       const opSize = JSON.stringify(opnames).length;
-      const totalKB = ((prodSize + txSize + opSize) / 1024).toFixed(1);
+      const totalBytes = prodSize + txSize + opSize;
+      const totalKB = (totalBytes / 1024).toFixed(1);
 
       document.getElementById("data-info-content").innerHTML = `
-        <div style="background:#f8f9fa;border-radius:8px;padding:12px;margin-bottom:10px;">
-          <div><b>Produk:</b> ${products.length} item</div>
+        <div style="background:#f8f9fa;border-radius:10px;padding:14px 16px;margin-bottom:12px;line-height:1.9;">
+          <div><b>Produk:</b> ${products.length} data</div>
           <div><b>Transaksi:</b> ${transactions.length} data</div>
           <div><b>Opname:</b> ${opnames.length} data</div>
         </div>
-        <div style="background:#f8f9fa;border-radius:8px;padding:12px;">
-          <div><b>Perkiraan ukuran:</b> ± ${totalKB} KB</div>
-          <div style="font-size:11px;color:#666;margin-top:4px;">Batas localStorage biasanya 5–10 MB</div>
+        <div style="background:#f8f9fa;border-radius:10px;padding:14px 16px;margin-bottom:14px;">
+          <div style="font-weight:700;margin-bottom:4px;">Perkiraan ukuran: ± ${totalKB} KB</div>
+          <div style="font-size:12px;color:#666;line-height:1.4;">Masih jauh di bawah batas penyimpanan perangkat.</div>
         </div>
-        <div style="margin-top:12px;font-size:12px;color:#666;">
-          Data disimpan di browser perangkat ini (localStorage).
+        <div style="font-size:12px;color:#666;line-height:1.5;">
+          Data tersimpan di perangkat ini secara offline.<br>
+          Gunakan <b>Export / Backup</b> secara berkala agar data tidak hilang jika aplikasi dihapus atau cache dibersihkan.
         </div>
       `;
       document.getElementById("data-info-modal").classList.add("show");
