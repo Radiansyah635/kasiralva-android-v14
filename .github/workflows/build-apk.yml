@@ -17,6 +17,9 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
       - name: Decode Keystore
         run: |
           echo "${{ secrets.KASIRALVA_KEYSTORE_BASE64 }}" | base64 --decode > app/release.keystore
