@@ -17,9 +17,25 @@ android {
         versionName = "1.1.0"
     }
 
+    signingConfigs {
+        create("release") {
+            val ksPath = System.getenv("KASIRALVA_KEYSTORE_PATH")
+            val ksPass = System.getenv("KASIRALVA_KEYSTORE_PASSWORD")
+            val alias = System.getenv("KASIRALVA_KEY_ALIAS")
+            val keyPass = System.getenv("KASIRALVA_KEY_PASSWORD")
+            if (!ksPath.isNullOrBlank()) {
+                storeFile = file(ksPath)
+                storePassword = ksPass
+                keyAlias = alias
+                keyPassword = keyPass
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 

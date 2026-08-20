@@ -64,18 +64,7 @@
     }
   };
 
-  document.addEventListener("DOMContentLoaded", function () {
-    const badge = document.createElement("div");
-    badge.textContent = "KasirAlva • Basic Offline";
-    badge.setAttribute("aria-label", "KasirAlva Basic Offline");
-    badge.style.cssText =
-      "position:fixed;right:10px;z-index:250;" +
-      "bottom:calc(56px + env(safe-area-inset-bottom, 0px) + 10px);" +
-      "padding:6px 10px;border-radius:999px;font:600 11px system-ui,sans-serif;" +
-      "background:#111;color:#fff;opacity:.82;pointer-events:none;";
-    document.body.appendChild(badge);
-  });
-})();
+  })();
 </script>
 
   <meta charset="UTF-8" />
@@ -568,142 +557,113 @@
     .opname-card {
       background: #fff;
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
+      border-radius: 10px;
+      padding: 12px;
       margin-bottom: 10px;
+      position: relative;
     }
     .opname-top {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       gap: 8px;
     }
-    .opname-name { font-size: 14px; font-weight: 700; color: #222; }
-    .opname-date { font-size: 11px; color: #999; white-space: nowrap; }
+    .opname-name { font-size: 13px; font-weight: bold; flex: 1; }
+    .opname-date { font-size: 10px; color: #888; white-space: nowrap; }
     .opname-grid {
       display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
+      justify-content: space-between;
       background: #f8f9fa;
-      padding: 10px 12px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-    .opname-grid .selisih-neg { color: var(--primary); }
-    .opname-grid .selisih-pos { color: var(--success); }
-    .opname-note { font-size: 12px; color: #666; margin-bottom: 8px; line-height: 1.4; }
-    .opname-del-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      background: #ffebee;
-      color: var(--primary);
-      border: none;
-      border-radius: 16px;
-      padding: 5px 12px;
+      padding: 8px;
+      border-radius: 6px;
       font-size: 12px;
       font-weight: 600;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    .opname-note { font-size: 11px; color: #666; font-style: italic; }
+    .opname-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .opname-del-btn {
+      border: none;
+      background: #fff5f5;
+      color: #c62828;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 6px;
       cursor: pointer;
     }
     .opname-toolbar {
       display: flex;
       gap: 8px;
+      flex-wrap: wrap;
       margin-bottom: 12px;
       align-items: center;
     }
-    .opname-toolbar .search-input {
+    .opname-search-wrap {
       flex: 1;
-      border: 1px solid #e0e0e0;
-      border-radius: 10px;
-      padding: 10px 14px 10px 36px;
-      font-size: 13px;
-      background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='M21 21l-4.35-4.35'/%3E%3C/svg%3E") no-repeat 12px center;
-      outline: none;
-    }
-    .opname-toolbar .search-input:focus { border-color: var(--primary); }
-    .opname-icon-btn {
-      width: 42px;
-      height: 42px;
-      border-radius: 10px;
-      border: none;
+      min-width: 140px;
       display: flex;
       align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 15px;
-      flex-shrink: 0;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0 10px;
+      height: 38px;
     }
-    .opname-icon-btn.print { background: var(--primary); color: #fff; }
-    .opname-icon-btn.trash { background: #fff; color: #666; border: 1px solid #e0e0e0; }
-
-    /* Batch Opname Modal */
-    .batch-opname-hint {
-      font-size: 12px;
-      color: #666;
-      margin-bottom: 12px;
-      line-height: 1.45;
-    }
-    .batch-search {
-      width: 100%;
-      border: 1px solid #e0e0e0;
-      border-radius: 10px;
-      padding: 10px 14px 10px 36px;
-      font-size: 13px;
-      margin-bottom: 12px;
-      background: #fafafa url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='M21 21l-4.35-4.35'/%3E%3C/svg%3E") no-repeat 12px center;
+    .opname-search-wrap input {
+      border: none;
       outline: none;
+      flex: 1;
+      font-size: 13px;
+      background: transparent;
+      height: 100%;
     }
-    .batch-search:focus { border-color: var(--primary); background-color: #fff; }
-    .batch-table-wrap {
+    .opname-batch-row {
+      display: grid;
+      grid-template-columns: 1fr 70px 80px;
+      gap: 8px;
+      align-items: center;
+      padding: 10px;
+      border-bottom: 1px solid #f1f3f5;
+      font-size: 13px;
+    }
+    .opname-batch-row:last-child { border-bottom: none; }
+    .opname-batch-row input {
+      width: 100%;
+      height: 34px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 0 8px;
+      font-size: 13px;
+    }
+    .opname-batch-sys { color: #777; font-size: 12px; text-align: center; }
+    .opname-batch-header {
+      display: grid;
+      grid-template-columns: 1fr 70px 80px;
+      gap: 8px;
+      padding: 6px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #666;
+      background: #f8f9fa;
+      border-radius: 8px 8px 0 0;
+      border: 1px solid #e5e5e5;
+      border-bottom: none;
+    }
+    .opname-batch-list {
       max-height: 280px;
       overflow-y: auto;
-      border: 1px solid #eee;
-      border-radius: 10px;
-      margin-bottom: 14px;
+      border: 1px solid #e5e5e5;
+      border-radius: 0 0 8px 8px;
+      margin-bottom: 12px;
     }
-    .batch-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-    .batch-table thead th {
-      position: sticky;
-      top: 0;
-      background: #f8f9fa;
-      text-align: left;
-      padding: 10px 12px;
-      font-weight: 600;
-      color: #555;
-      border-bottom: 1px solid #eee;
-      font-size: 12px;
-    }
-    .batch-table thead th:nth-child(2),
-    .batch-table thead th:nth-child(3) { text-align: center; }
-    .batch-table tbody td {
-      padding: 10px 12px;
-      border-bottom: 1px solid #f3f3f3;
-      vertical-align: middle;
-    }
-    .batch-table tbody tr:last-child td { border-bottom: none; }
-    .batch-prod-name { font-weight: 700; color: #222; }
-    .batch-prod-unit { font-size: 11px; color: #999; margin-top: 2px; }
-    .batch-sys { text-align: center; font-weight: 600; color: #555; }
-    .batch-fisik-input {
-      width: 72px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 7px 8px;
-      font-size: 13px;
-      text-align: center;
-      outline: none;
-      display: block;
-      margin: 0 auto;
-    }
-    .batch-fisik-input:focus { border-color: var(--primary); }
-    .batch-fisik-input::placeholder { color: #bbb; }
 
     /* Reports */
     .report-grid {
@@ -1492,9 +1452,16 @@
             </button>
           </div>
           <div class="opname-toolbar">
-            <input type="text" class="search-input" id="opname-search" placeholder="Cari produk / catatan..." oninput="renderOpnames()" />
-            <button class="opname-icon-btn print" title="Cetak" onclick="printOpnames()"><i class="fas fa-print"></i></button>
-            <button class="opname-icon-btn trash" title="Hapus semua" onclick="clearAllOpnames()"><i class="fas fa-trash"></i></button>
+            <div class="opname-search-wrap">
+              <i class="fas fa-search" style="color:#999;margin-right:6px;font-size:13px;"></i>
+              <input type="text" id="opname-search" placeholder="Cari produk / catatan..." oninput="renderOpnames()" />
+            </div>
+            <button class="btn-primary" style="height:38px;padding:0 12px;font-size:12px;" onclick="printOpnameReport()" title="Cetak riwayat">
+              <i class="fas fa-print"></i>
+            </button>
+            <button type="button" onclick="clearAllOpnames()" style="height:38px;padding:0 12px;font-size:12px;border:1px solid #ffcdd2;background:#fff;color:#c62828;border-radius:8px;font-weight:600;cursor:pointer;" title="Hapus semua riwayat">
+              <i class="fas fa-trash"></i>
+            </button>
           </div>
           <div id="opname-list"></div>
         </div>
@@ -1571,27 +1538,27 @@
       <div id="tab-settings" class="tab-content">
         <div class="tab-inner">
           <div class="section-title">Pengaturan Toko</div>
-          <div class="section-sub" style="margin-bottom:14px;">Informasi, backup &amp; keamanan</div>
+          <div class="section-sub" style="margin-bottom:14px;">Informasi, backup & keamanan</div>
 
-          <!-- Info Toko + Password -->
-          <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px;">
+          <!-- Edit Nama Toko -->
+          <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;">
             <div class="modal-label">Nama Toko</div>
             <input type="text" class="modal-input" id="setting-store-name" placeholder="Nama toko" style="margin-bottom:10px;" />
             <div class="modal-label">Alamat Toko</div>
             <input type="text" class="modal-input" id="setting-store-addr" placeholder="Alamat toko" style="margin-bottom:10px;" />
             <div class="modal-label">Ganti Password Owner</div>
-            <input type="password" class="modal-input" id="setting-owner-password" placeholder="Isi password baru (kosongkan = tidak diganti)" style="margin-bottom:6px;" />
-            <p style="font-size:11px;color:#888;margin:0 0 12px;line-height:1.4;">Melindungi menu Inventaris &amp; Toko. Setelah diganti, Anda harus login ulang.</p>
-            <button class="btn-primary" style="width:100%;justify-content:center;margin-bottom:10px;" onclick="saveStoreSettings()">
+            <input type="password" class="modal-input" id="setting-owner-password" placeholder="Isi password baru (kosongkan = tidak diganti)" style="margin-bottom:6px;" autocomplete="new-password" />
+            <p style="font-size:11px;color:#888;margin:0 0 10px;">Melindungi menu Inventaris &amp; Toko. Setelah diganti, Anda harus login ulang.</p>
+            <button class="btn-primary" style="width:100%;justify-content:center;" onclick="saveStoreSettings()">
               <i class="fas fa-save"></i> Simpan Pengaturan Toko
             </button>
-            <button type="button" onclick="lockOwnerMenu()" style="width:100%;background:#fff;border:1.5px solid #ddd;border-radius:10px;padding:12px;font-size:13px;font-weight:600;color:#555;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+            <button type="button" id="btn-lock-owner" onclick="lockOwnerAccess()" style="width:100%;margin-top:8px;padding:10px;border:1px solid #ccc;border-radius:8px;background:#fff;color:#555;font-weight:600;cursor:pointer;">
               <i class="fas fa-lock"></i> Kunci Kembali Menu Owner
             </button>
           </div>
 
-          <!-- Manajemen Data (simple) -->
-          <div class="section-title" style="font-size:15px;margin:8px 0 12px;">Manajemen Data</div>
+          <!-- Data Management -->
+          <div class="section-title" style="font-size:14px;margin:16px 0 10px;">Manajemen Data</div>
 
           <div class="setting-card" style="cursor:pointer;" onclick="showDataInfo()">
             <i class="fas fa-database" style="font-size:22px;color:var(--primary);"></i>
@@ -1630,7 +1597,7 @@
             <i class="fas fa-chevron-right" style="color:#aaa;"></i>
           </div>
 
-          <button class="btn-reset" onclick="resetData()" style="margin-top:8px;">
+          <button class="btn-reset" onclick="resetData()" style="margin-top:16px;">
             <i class="fas fa-redo"></i> Reset Semua Data ke Demo Awal
           </button>
         </div>
@@ -1688,22 +1655,22 @@
         <div class="modal-title">Akses Owner</div>
         <button class="modal-close" onclick="closeModal('password-modal')">&times;</button>
       </div>
-      <div class="modal-label" style="margin-bottom:10px;">Masukkan password owner untuk membuka menu Inventaris &amp; Toko</div>
-      <input type="password" class="modal-input" id="owner-password-input" placeholder="Password owner" onkeydown="if(event.key==='Enter')checkOwnerPassword()" style="border:1.5px solid var(--primary);" />
-      <p style="font-size:12px;color:#888;margin:-4px 0 14px;line-height:1.4;">Password dapat diganti di menu Toko setelah berhasil masuk.</p>
+      <div class="modal-label">Masukkan password owner untuk membuka menu Inventaris & Toko</div>
+      <input type="password" class="modal-input" id="owner-password-input" placeholder="Password owner" onkeydown="if(event.key==='Enter')checkOwnerPassword()" />
+      <p style="font-size:11px;color:#888;margin:-6px 0 12px;">Password dapat diganti di menu Toko setelah berhasil masuk.</p>
       <button class="btn-confirm" onclick="checkOwnerPassword()">BUKA AKSES</button>
     </div>
   </div>
 
   <!-- Data Info Modal -->
   <div class="modal-overlay" id="data-info-modal">
-    <div class="modal" style="max-width:380px;">
+    <div class="modal" style="max-width:400px;">
       <div class="modal-header">
         <div class="modal-title">Data Tersimpan</div>
         <button class="modal-close" onclick="closeModal('data-info-modal')">&times;</button>
       </div>
-      <div id="data-info-content"></div>
-      <button class="btn-confirm" style="margin-top:16px;" onclick="closeModal('data-info-modal')">TUTUP</button>
+      <div id="data-info-content" style="font-size:13px;line-height:1.8;"></div>
+      <button class="btn-confirm" style="margin-top:12px;" onclick="closeModal('data-info-modal')">TUTUP</button>
     </div>
   </div>
 
@@ -1827,35 +1794,27 @@
     </div>
   </div>
 
-  <!-- Opname Modal (Batch) -->
+  <!-- Opname Modal -->
   <div class="modal-overlay" id="opname-modal">
-    <div class="modal" style="max-width:440px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;">
+    <div class="modal">
       <div class="modal-header">
         <div class="modal-title">Opname Stok (Batch)</div>
         <button class="modal-close" onclick="closeModal('opname-modal')">&times;</button>
       </div>
-      <div style="overflow-y:auto;flex:1;padding-right:2px;">
-        <div class="batch-opname-hint">
-          Isi stok fisik hanya untuk produk yang dihitung.<br>
-          Kosongkan yang tidak diopname.
-        </div>
-        <input type="text" class="batch-search" id="batch-opname-search" placeholder="Cari produk di daftar..." oninput="filterBatchOpnameList()" />
-        <div class="batch-table-wrap">
-          <table class="batch-table">
-            <thead>
-              <tr>
-                <th>Produk</th>
-                <th style="width:70px;">Sistem</th>
-                <th style="width:90px;">Fisik</th>
-              </tr>
-            </thead>
-            <tbody id="batch-opname-body"></tbody>
-          </table>
-        </div>
-        <div class="modal-label">Catatan (opsional, berlaku untuk semua yang disimpan)</div>
-        <input type="text" class="modal-input" id="opname-note" placeholder="Misal: Opname gudang 20 Agu 2026" style="margin-bottom:4px;" />
+      <div class="modal-label" style="margin-bottom:8px;color:#666;font-weight:400;">Isi stok fisik hanya untuk produk yang dihitung. Kosongkan yang tidak diopname.</div>
+      <div class="opname-search-wrap" style="margin-bottom:10px;">
+        <i class="fas fa-search" style="color:#999;margin-right:6px;font-size:13px;"></i>
+        <input type="text" id="opname-modal-search" placeholder="Cari produk di daftar..." oninput="filterOpnameBatchList()" />
       </div>
-      <button class="btn-confirm" style="margin-top:12px;" onclick="saveOpname()">SIMPAN &amp; UPDATE STOK</button>
+      <div class="opname-batch-header">
+        <div>Produk</div>
+        <div style="text-align:center;">Sistem</div>
+        <div style="text-align:center;">Fisik</div>
+      </div>
+      <div class="opname-batch-list" id="opname-product-list"></div>
+      <div class="modal-label">Catatan (opsional, berlaku untuk semua yang disimpan)</div>
+      <input type="text" class="modal-input" id="opname-note" placeholder="Misal: Opname gudang 20 Agu 2026" />
+      <button class="btn-confirm" onclick="saveOpnameBatch()">SIMPAN & UPDATE STOK</button>
     </div>
   </div>
 
@@ -2140,19 +2099,35 @@
     }
 
     function checkOwnerPassword() {
-      const input = document.getElementById("owner-password-input").value;
+      const input = document.getElementById("owner-password-input").value.trim();
+      if (!input) {
+        showToast("Masukkan password terlebih dahulu");
+        document.getElementById("owner-password-input").focus();
+        return;
+      }
       if (input === (storeSettings.ownerPassword || "1234")) {
         ownerUnlocked = true;
         closeModal("password-modal");
+        document.getElementById("owner-password-input").value = "";
         const target = pendingOwnerTab || "products";
         pendingOwnerTab = null;
         switchTab(target);
-        showToast("Akses Owner dibuka");
+        showToast("Akses Owner berhasil dibuka");
       } else {
-        showToast("Password salah!");
+        showToast("Password salah. Coba lagi.");
         document.getElementById("owner-password-input").value = "";
         document.getElementById("owner-password-input").focus();
       }
+    }
+
+    function lockOwnerAccess() {
+      if (!ownerUnlocked) {
+        showToast("Menu Owner sudah terkunci");
+        return;
+      }
+      ownerUnlocked = false;
+      showToast("Menu Inventaris & Toko dikunci kembali");
+      switchTab("pos");
     }
 
     // ===================== POS =====================
@@ -2601,194 +2576,214 @@
       if (!q) return opnames;
       return opnames.filter(op =>
         (op.productName || "").toLowerCase().includes(q) ||
-        (op.note || "").toLowerCase().includes(q)
+        (op.note || "").toLowerCase().includes(q) ||
+        (op.date || "").toLowerCase().includes(q)
       );
     }
 
     function renderOpnames() {
       const list = document.getElementById("opname-list");
+      if (!list) return;
       const filtered = getFilteredOpnames();
+      if (opnames.length === 0) {
+        list.innerHTML = `<div class="empty-state"><i class="fas fa-clipboard-list"></i><div>Belum ada riwayat opname</div><div style="font-size:12px;margin-top:6px;">Tekan "Opname Baru" untuk mulai hitung stok fisik</div></div>`;
+        return;
+      }
       if (filtered.length === 0) {
-        list.innerHTML = `<div class="empty-state"><i class="fas fa-clipboard-list"></i><div>${opnames.length === 0 ? "Belum ada riwayat opname" : "Tidak ada hasil pencarian"}</div></div>`;
+        list.innerHTML = `<div class="empty-state"><i class="fas fa-search"></i><div>Tidak ada hasil untuk pencarian ini</div></div>`;
         return;
       }
       list.innerHTML = filtered.map(op => {
-        const actual = op.actualStock != null ? op.actualStock : op.physicalStock;
-        const diff = op.difference != null ? op.difference : (actual - op.systemStock);
-        const diffClass = diff < 0 ? "selisih-neg" : (diff > 0 ? "selisih-pos" : "");
-        const diffText = (diff > 0 ? "+" : "") + diff;
+        const diffColor = op.difference < 0 ? "var(--primary)" : (op.difference > 0 ? "var(--success)" : "#555");
+        const diffText = (op.difference > 0 ? "+" : "") + op.difference;
         return `
         <div class="opname-card">
           <div class="opname-top">
-            <div class="opname-name">${op.productName || "-"}</div>
-            <div class="opname-date">${op.date || ""}</div>
+            <div class="opname-name">${op.productName}</div>
+            <div class="opname-date">${op.date}</div>
           </div>
           <div class="opname-grid">
             <span>Sistem: ${op.systemStock}</span>
-            <span>Fisik: ${actual}</span>
-            <span class="${diffClass}">Selisih: ${diffText}</span>
+            <span>Fisik: ${op.actualStock}</span>
+            <span style="color:${diffColor}">Selisih: ${diffText}</span>
           </div>
-          ${op.note ? `<div class="opname-note">Catatan: ${op.note}</div>` : ""}
-          <button class="opname-del-btn" onclick="deleteOpname('${op.id}')"><i class="fas fa-trash"></i> Hapus</button>
+          <div class="opname-note">Catatan: ${op.note || "-"}</div>
+          <div class="opname-actions">
+            <button type="button" class="opname-del-btn" onclick="deleteOpname('${op.id}')">
+              <i class="fas fa-trash-alt"></i> Hapus
+            </button>
+          </div>
         </div>`;
       }).join("");
     }
 
     function openOpnameModal() {
-      batchOpnameDraft = {};
-      document.getElementById("opname-note").value = "";
-      const searchEl = document.getElementById("batch-opname-search");
+      const noteEl = document.getElementById("opname-note");
+      const searchEl = document.getElementById("opname-modal-search");
+      if (noteEl) noteEl.value = "";
       if (searchEl) searchEl.value = "";
-      renderBatchOpnameList();
+      renderOpnameBatchList();
       document.getElementById("opname-modal").classList.add("show");
     }
 
-    // Simpan nilai fisik sementara saat filter agar tidak hilang
-    let batchOpnameDraft = {};
-
-    function captureBatchDraft() {
-      document.querySelectorAll("#batch-opname-body .batch-fisik-input").forEach(inp => {
-        const id = inp.getAttribute("data-product-id");
-        if (id) batchOpnameDraft[id] = inp.value;
-      });
-    }
-
-    function renderBatchOpnameList() {
-      captureBatchDraft();
-      const q = (document.getElementById("batch-opname-search")?.value || "").trim().toLowerCase();
-      const body = document.getElementById("batch-opname-body");
-      const list = q
-        ? products.filter(p => (p.name || "").toLowerCase().includes(q) || (p.barcode || "").toLowerCase().includes(q))
-        : products;
-      if (list.length === 0) {
-        body.innerHTML = `<tr><td colspan="3" style="text-align:center;color:#999;padding:20px;">Tidak ada produk</td></tr>`;
+    function renderOpnameBatchList(filterQ) {
+      const list = document.getElementById("opname-product-list");
+      if (!list) return;
+      const q = (filterQ != null ? filterQ : (document.getElementById("opname-modal-search")?.value || "")).trim().toLowerCase();
+      const rows = products.filter(p => !q || p.name.toLowerCase().includes(q) || (p.barcode || "").includes(q));
+      if (rows.length === 0) {
+        list.innerHTML = `<div style="padding:16px;text-align:center;color:#999;font-size:13px;">Produk tidak ditemukan</div>`;
         return;
       }
-      body.innerHTML = list.map(p => {
-        const draft = batchOpnameDraft[p.id] != null ? batchOpnameDraft[p.id] : "";
-        return `
-        <tr data-pid="${p.id}">
-          <td>
-            <div class="batch-prod-name">${p.name}</div>
-            <div class="batch-prod-unit">${p.unit || "pcs"}</div>
-          </td>
-          <td class="batch-sys">${p.stock}</td>
-          <td>
-            <input type="number" class="batch-fisik-input" data-product-id="${p.id}" data-system="${p.stock}" placeholder="—" min="0" inputmode="numeric" value="${draft}" />
-          </td>
-        </tr>`;
-      }).join("");
+      list.innerHTML = rows.map(p => `
+        <div class="opname-batch-row" data-pid="${p.id}">
+          <div>
+            <div style="font-weight:600;">${p.name}</div>
+            <div style="font-size:11px;color:#999;">${p.unit || "pcs"}</div>
+          </div>
+          <div class="opname-batch-sys">${p.stock}</div>
+          <div>
+            <input type="number" min="0" step="1" inputmode="numeric" data-opname-input="${p.id}" placeholder="—" />
+          </div>
+        </div>
+      `).join("");
     }
 
-    function filterBatchOpnameList() {
-      renderBatchOpnameList();
+    function filterOpnameBatchList() {
+      renderOpnameBatchList();
     }
 
-    function saveOpname() {
-      // Ambil semua draft termasuk yang sedang tidak tampil karena filter
-      captureBatchDraft();
-      const note = (document.getElementById("opname-note").value || "").trim();
-      const now = new Date().toISOString().replace("T", " ").substring(0, 19);
-      const ts = Date.now();
-      let saved = 0;
-      let idx = 0;
-
-      Object.keys(batchOpnameDraft).forEach(productId => {
-        const val = String(batchOpnameDraft[productId] || "").trim();
+    function saveOpnameBatch() {
+      const note = (document.getElementById("opname-note")?.value || "").trim() || "Koreksi Stok Opname Gudang";
+      const inputs = document.querySelectorAll("[data-opname-input]");
+      const entries = [];
+      inputs.forEach(inp => {
+        const val = inp.value.trim();
         if (val === "") return;
         const actual = parseInt(val, 10);
         if (isNaN(actual) || actual < 0) return;
-
-        const product = products.find(p => p.id === productId);
+        const pid = inp.getAttribute("data-opname-input");
+        const product = products.find(p => p.id === pid);
         if (!product) return;
-
-        const systemStock = product.stock;
-        const diff = actual - systemStock;
-
-        opnames.unshift({
-          id: "op-" + ts + "-" + idx,
-          productId: product.id,
-          productName: product.name,
-          systemStock: systemStock,
-          actualStock: actual,
-          physicalStock: actual,
-          difference: diff,
-          note: note || "Opname stok batch",
-          date: now,
-          createdAt: ts
-        });
-
-        product.stock = actual;
-        saved++;
-        idx++;
+        entries.push({ product, actual });
       });
-
-      if (saved === 0) {
-        showToast("Isi minimal 1 stok fisik untuk disimpan");
+      if (entries.length === 0) {
+        showToast("Isi minimal 1 stok fisik produk");
         return;
       }
-
+      const now = new Date().toISOString().replace("T", " ").substring(0, 19);
+      let baseId = Date.now();
+      entries.forEach(({ product, actual }, i) => {
+        const diff = actual - product.stock;
+        opnames.unshift({
+          id: "op-" + (baseId + i),
+          productId: product.id,
+          productName: product.name,
+          systemStock: product.stock,
+          actualStock: actual,
+          difference: diff,
+          note,
+          date: now
+        });
+        product.stock = actual;
+      });
       saveState();
       closeModal("opname-modal");
       renderOpnames();
       renderPosProducts();
-      if (typeof renderProducts === "function") renderProducts();
       updateLowStockAlert();
-      showToast(saved + " produk berhasil di-opname & stok diupdate!");
+      showToast(entries.length + " produk berhasil di-opname & stok diperbarui");
     }
 
     function deleteOpname(id) {
-      if (!confirm("Hapus data opname ini?")) return;
-      opnames = opnames.filter(o => o.id !== id);
+      if (!confirm("Hapus riwayat opname ini?\n(Stok produk tidak diubah balik)")) return;
+      opnames = opnames.filter(op => op.id !== id);
       saveState();
       renderOpnames();
-      showToast("Data opname dihapus");
+      showToast("Riwayat opname dihapus");
     }
 
     function clearAllOpnames() {
       if (opnames.length === 0) {
-        showToast("Tidak ada data opname");
+        showToast("Belum ada riwayat opname");
         return;
       }
-      if (!confirm("Hapus SEMUA riwayat opname? Stok produk tidak berubah.")) return;
+      if (!confirm("Hapus SEMUA riwayat opname?\nStok produk tetap seperti sekarang (tidak dikembalikan).")) return;
       opnames = [];
       saveState();
       renderOpnames();
       showToast("Semua riwayat opname dihapus");
     }
 
-    function printOpnames() {
+    function printOpnameReport() {
       const filtered = getFilteredOpnames();
       if (filtered.length === 0) {
-        showToast("Tidak ada data untuk dicetak");
+        showToast("Tidak ada data opname untuk dicetak");
         return;
       }
-      const storeName = (storeSettings && storeSettings.name) || "KasirAlva Mart";
-      let rows = filtered.map(op => {
-        const actual = op.actualStock != null ? op.actualStock : op.physicalStock;
-        const diff = op.difference != null ? op.difference : (actual - op.systemStock);
+      const storeName = storeSettings.name || "KasirAlva Mart";
+      const storeAddr = storeSettings.address || "";
+      const printDate = new Date().toLocaleString("id-ID");
+      let totalMinus = 0, totalPlus = 0;
+      const rows = filtered.map((op, i) => {
+        if (op.difference < 0) totalMinus += op.difference;
+        if (op.difference > 0) totalPlus += op.difference;
+        const diffText = (op.difference > 0 ? "+" : "") + op.difference;
         return `<tr>
-          <td style="padding:6px;border-bottom:1px solid #ddd;">${op.productName}</td>
-          <td style="padding:6px;border-bottom:1px solid #ddd;text-align:center;">${op.systemStock}</td>
-          <td style="padding:6px;border-bottom:1px solid #ddd;text-align:center;">${actual}</td>
-          <td style="padding:6px;border-bottom:1px solid #ddd;text-align:center;">${diff > 0 ? "+" : ""}${diff}</td>
-          <td style="padding:6px;border-bottom:1px solid #ddd;font-size:11px;">${op.note || "-"}</td>
-          <td style="padding:6px;border-bottom:1px solid #ddd;font-size:11px;">${op.date || ""}</td>
+          <td style="padding:6px 4px;border-bottom:1px solid #eee;font-size:11px;">${i + 1}</td>
+          <td style="padding:6px 4px;border-bottom:1px solid #eee;font-size:11px;">${op.productName}</td>
+          <td style="padding:6px 4px;border-bottom:1px solid #eee;font-size:11px;text-align:center;">${op.systemStock}</td>
+          <td style="padding:6px 4px;border-bottom:1px solid #eee;font-size:11px;text-align:center;">${op.actualStock}</td>
+          <td style="padding:6px 4px;border-bottom:1px solid #eee;font-size:11px;text-align:center;font-weight:bold;">${diffText}</td>
+          <td style="padding:6px 4px;border-bottom:1px solid #eee;font-size:10px;">${op.note || "-"}</td>
+          <td style="padding:6px 4px;border-bottom:1px solid #eee;font-size:10px;">${op.date}</td>
         </tr>`;
       }).join("");
-      const w = window.open("", "_blank", "width=800,height=600");
-      w.document.write(`<!DOCTYPE html><html><head><title>Laporan Opname</title>
-        <style>body{font-family:sans-serif;padding:20px;} h2{margin:0 0 4px;} table{width:100%;border-collapse:collapse;font-size:13px;} th{background:#f0f0f0;padding:8px;text-align:left;border-bottom:2px solid #ccc;}</style>
-        </head><body>
-        <h2>${storeName}</h2>
-        <p style="color:#666;margin:0 0 16px;">Laporan Stok Opname & Audit — ${new Date().toLocaleString("id-ID")}</p>
-        <table>
-          <thead><tr><th>Produk</th><th>Sistem</th><th>Fisik</th><th>Selisih</th><th>Catatan</th><th>Tanggal</th></tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
-        <script>window.onload=function(){window.print();}</script>
-        </body></html>`);
-      w.document.close();
+
+      const printContent = `
+        <div style="font-family:system-ui,sans-serif;color:#222;padding:12px;">
+          <div style="text-align:center;margin-bottom:12px;">
+            <div style="font-size:16px;font-weight:bold;">${storeName}</div>
+            <div style="font-size:11px;color:#666;">${storeAddr}</div>
+            <div style="font-size:14px;font-weight:700;margin-top:8px;">Laporan Stok Opname</div>
+            <div style="font-size:10px;color:#888;">Dicetak: ${printDate}</div>
+          </div>
+          <table style="width:100%;border-collapse:collapse;">
+            <thead>
+              <tr style="background:#f5f5f5;">
+                <th style="padding:6px 4px;font-size:10px;text-align:left;">#</th>
+                <th style="padding:6px 4px;font-size:10px;text-align:left;">Produk</th>
+                <th style="padding:6px 4px;font-size:10px;">Sistem</th>
+                <th style="padding:6px 4px;font-size:10px;">Fisik</th>
+                <th style="padding:6px 4px;font-size:10px;">Selisih</th>
+                <th style="padding:6px 4px;font-size:10px;text-align:left;">Catatan</th>
+                <th style="padding:6px 4px;font-size:10px;text-align:left;">Tanggal</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+          <div style="margin-top:14px;font-size:11px;">
+            <div>Total baris: <b>${filtered.length}</b></div>
+            <div>Total selisih plus: <b style="color:#2E7D32;">+${totalPlus}</b></div>
+            <div>Total selisih minus: <b style="color:#c62828;">${totalMinus}</b></div>
+          </div>
+          <div style="margin-top:20px;font-size:10px;color:#888;text-align:center;border-top:1px dashed #ccc;padding-top:8px;">
+            Dokumen ini digenerate oleh KasirAlva • Basic Offline
+          </div>
+        </div>
+      `;
+      const printArea = document.getElementById("print-area");
+      printArea.innerHTML = printContent;
+      printArea.style.display = "block";
+      setTimeout(() => {
+        if (window.KasirAlvaNative && window.KasirAlvaNative.printPage) {
+          window.KasirAlvaNative.printPage("Laporan Opname KasirAlva");
+        } else {
+          window.print();
+        }
+        printArea.style.display = "none";
+        printArea.innerHTML = "";
+      }, 200);
     }
 
     // ===================== REPORTS =====================
@@ -3038,57 +3033,70 @@
       applyStoreSettings();
       document.getElementById("setting-owner-password").value = "";
       if (!newPass) showToast("Pengaturan toko disimpan");
-      if (newPass) switchTab("pos");
-    }
-
-    function lockOwnerMenu() {
-      ownerUnlocked = false;
-      showToast("Menu Owner dikunci kembali");
-      switchTab("pos");
     }
 
     function showDataInfo() {
       const prodSize = JSON.stringify(products).length;
       const txSize = JSON.stringify(transactions).length;
       const opSize = JSON.stringify(opnames).length;
-      const totalBytes = prodSize + txSize + opSize;
-      const totalKB = (totalBytes / 1024).toFixed(1);
+      const settingsSize = JSON.stringify(storeSettings).length;
+      const totalKB = ((prodSize + txSize + opSize + settingsSize) / 1024).toFixed(1);
+      const limitNote = totalKB < 100
+        ? "Masih jauh di bawah batas penyimpanan perangkat."
+        : "Disarankan backup berkala agar data aman.";
 
       document.getElementById("data-info-content").innerHTML = `
-        <div style="background:#f8f9fa;border-radius:10px;padding:14px 16px;margin-bottom:12px;line-height:1.9;">
+        <div style="background:#f8f9fa;border-radius:8px;padding:12px;margin-bottom:10px;">
           <div><b>Produk:</b> ${products.length} data</div>
           <div><b>Transaksi:</b> ${transactions.length} data</div>
           <div><b>Opname:</b> ${opnames.length} data</div>
         </div>
-        <div style="background:#f8f9fa;border-radius:10px;padding:14px 16px;margin-bottom:14px;">
-          <div style="font-weight:700;margin-bottom:4px;">Perkiraan ukuran: ± ${totalKB} KB</div>
-          <div style="font-size:12px;color:#666;line-height:1.4;">Masih jauh di bawah batas penyimpanan perangkat.</div>
+        <div style="background:#f8f9fa;border-radius:8px;padding:12px;">
+          <div><b>Perkiraan ukuran:</b> ± ${totalKB} KB</div>
+          <div style="font-size:11px;color:#666;margin-top:4px;">${limitNote}</div>
         </div>
-        <div style="font-size:12px;color:#666;line-height:1.5;">
-          Data tersimpan di perangkat ini secara offline.<br>
-          Gunakan <b>Export / Backup</b> secara berkala agar data tidak hilang jika aplikasi dihapus atau cache dibersihkan.
+        <div style="margin-top:12px;font-size:12px;color:#666;line-height:1.5;">
+          Data tersimpan di perangkat ini secara offline. Gunakan <b>Export / Backup</b> secara berkala agar data tidak hilang jika aplikasi dihapus atau cache dibersihkan.
         </div>
       `;
       document.getElementById("data-info-modal").classList.add("show");
     }
 
     function exportData() {
-      const payload = {
-        exportedAt: new Date().toISOString(),
-        store: storeSettings,
-        products,
-        transactions,
-        opnames
-      };
-      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      const dateStr = new Date().toISOString().substring(0, 10);
-      a.href = url;
-      a.download = `kasiralva-backup-${dateStr}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-      showToast("Backup berhasil diunduh");
+      // Prioritas: native backup (lebih andal di Android, bisa pilih folder)
+      if (window.KasirAlvaNative && window.KasirAlvaNative.requestBackup) {
+        try {
+          window.KasirAlvaNative.requestBackup();
+          showToast("Menyimpan backup... pilih lokasi jika diminta.");
+          return;
+        } catch (e) {
+          console.warn("Native backup failed, fallback JSON", e);
+        }
+      }
+      try {
+        const payload = {
+          app: "KasirAlva",
+          exportedAt: new Date().toISOString(),
+          store: storeSettings,
+          products,
+          transactions,
+          opnames
+        };
+        const json = JSON.stringify(payload, null, 2);
+        const blob = new Blob([json], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        const dateStr = new Date().toISOString().substring(0, 10);
+        a.href = url;
+        a.download = `kasiralva-backup-${dateStr}.json`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1500);
+        showToast("Backup JSON diproses. Cek folder Download / notifikasi HP.");
+      } catch (err) {
+        showToast("Gagal membuat file backup. Coba lagi.");
+      }
     }
 
     function importData(event) {
@@ -3099,29 +3107,36 @@
         try {
           const data = JSON.parse(e.target.result);
           if (!data.products || !Array.isArray(data.products)) {
-            showToast("File backup tidak valid");
+            showToast("File backup tidak valid atau bukan format KasirAlva");
+            event.target.value = "";
             return;
           }
-          if (!confirm("Import akan mengganti data produk, transaksi & opname saat ini. Lanjutkan?")) {
+          if (!confirm("Import akan mengganti data produk, transaksi & opname saat ini.\nPastikan file backup benar. Lanjutkan?")) {
             event.target.value = "";
             return;
           }
           products = data.products;
-          transactions = data.transactions || [];
-          opnames = data.opnames || [];
-          if (data.store) {
+          transactions = Array.isArray(data.transactions) ? data.transactions : [];
+          opnames = Array.isArray(data.opnames) ? data.opnames : [];
+          if (data.store && typeof data.store === "object") {
             storeSettings = { ...storeSettings, ...data.store };
           }
           saveState();
           applyStoreSettings();
           ownerUnlocked = false;
+          cart = [];
           renderPosProducts();
           renderCart();
           updateLowStockAlert();
-          showToast("Data berhasil dipulihkan!");
+          if (typeof renderOpnames === "function") renderOpnames();
+          showToast("Data berhasil dipulihkan. Silakan buka ulang menu bila perlu.");
         } catch (err) {
           showToast("Gagal membaca file backup");
         }
+        event.target.value = "";
+      };
+      reader.onerror = function () {
+        showToast("Gagal membaca file");
         event.target.value = "";
       };
       reader.readAsText(file);
