@@ -1118,7 +1118,8 @@
           var nativeProducts = JSON.parse(json);
           if (Array.isArray(nativeProducts) && nativeProducts.length) {
             products = nativeProducts;
-            if (typeof renderAll === "function") renderAll();
+            if (typeof renderPosProducts === "function") renderPosProducts();
+            if (typeof renderCategories === "function") renderCategories();
           }
         }
       } catch (e) {
@@ -1234,7 +1235,7 @@
         if (json && typeof storeSettings !== "undefined") {
           var s = JSON.parse(json);
           Object.keys(s).forEach(function(k){ storeSettings[k] = s[k]; });
-          if (typeof renderAll === "function") renderAll();
+          if (typeof applyStoreSettings === "function") applyStoreSettings();
         }
       } catch(e) {}
     }
@@ -2168,7 +2169,7 @@
               <span class="stock-badge ${isLow ? 'low' : ''}">Stok: ${p.stock}</span>
               <span class="product-cat">${p.category}</span>
             </div>
-            <div class="product-name">${p.name}</div>
+            <div class="product-name">${p.name || '(Tanpa nama)'}</div>
             <div class="product-bottom">
               <span class="product-price">${formatIDR(p.sellPrice)}</span>
               <div class="add-circle"><i class="fas fa-plus" style="font-size:11px;"></i></div>
