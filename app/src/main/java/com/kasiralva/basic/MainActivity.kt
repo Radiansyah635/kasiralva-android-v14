@@ -6,6 +6,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.widget.Toast
 import android.print.PrintAttributes
 import android.print.PrintManager
 import android.webkit.JavascriptInterface
@@ -442,10 +443,26 @@ class MainActivity : ComponentActivity() {
         @JavascriptInterface
         fun printPage(jobName: String) {
             runOnUiThread {
-                val printManager = getSystemService(PRINT_SERVICE) as PrintManager
-                val safeName = if (jobName.isBlank()) "KasirAlva Document" else jobName
-                val adapter = webView.createPrintDocumentAdapter(safeName)
-                printManager.print(safeName, adapter, PrintAttributes.Builder().build())
+                try {
+                    val printManager = getSystemService(PRINT_SERVICE) as? PrintManager
+                    if (printManager == null) {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "Perangkat ini tidak mendukung fitur print Android.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        return@runOnUiThread
+                    }
+                    val safeName = if (jobName.isBlank()) "KasirAlva Document" else jobName
+                    val adapter = webView.createPrintDocumentAdapter(safeName)
+                    printManager.print(safeName, adapter, PrintAttributes.Builder().build())
+                } catch (e: Exception) {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Gagal membuka print: ${e.javaClass.simpleName} - ${e.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
             }
         }
 

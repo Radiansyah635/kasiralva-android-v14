@@ -2389,6 +2389,40 @@
       document.getElementById("receipt-modal").classList.add("show");
     }
 
+    // ------------------------------------------------------------------
+    // Helper cetak: konten print-area BARU disembunyikan setelah user
+    // kembali ke app (dialog print Android ditutup), bukan langsung
+    // setelah tombol ditekan. Sebab printPage() versi native itu
+    // ASYNC (beda dari window.print() yang synchronous) — kalau
+    // konten langsung dihapus, Android belum sempat "memotret" isinya
+    // untuk dijadikan PDF, hasilnya preview putih kosong.
+    // ------------------------------------------------------------------
+    function triggerNativePrint(jobName) {
+      const printArea = document.getElementById("print-area");
+
+      function cleanup() {
+        printArea.style.display = "none";
+        printArea.innerHTML = "";
+        window.removeEventListener("focus", cleanup);
+        document.removeEventListener("visibilitychange", visHandler);
+      }
+      function visHandler() {
+        if (document.visibilityState === "visible") cleanup();
+      }
+
+      if (window.KasirAlvaNative && window.KasirAlvaNative.printPage) {
+        window.KasirAlvaNative.printPage(jobName);
+        // Bersihkan saat kembali ke app (dialog print ditutup/selesai).
+        window.addEventListener("focus", cleanup);
+        document.addEventListener("visibilitychange", visHandler);
+        // Jaga-jaga kalau event focus/visibilitychange tidak terpicu.
+        setTimeout(cleanup, 15000);
+      } else {
+        window.print();
+        cleanup();
+      }
+    }
+
     function printReceipt() {
       if (!lastTransaction) return;
       const tx = lastTransaction;
@@ -2434,13 +2468,7 @@
       printArea.style.display = "block";
 
       setTimeout(() => {
-        if (window.KasirAlvaNative && window.KasirAlvaNative.printPage) {
-          window.KasirAlvaNative.printPage("Struk KasirAlva");
-        } else {
-          window.print();
-        }
-        printArea.style.display = "none";
-        printArea.innerHTML = "";
+        triggerNativePrint("Struk KasirAlva");
       }, 150);
     }
 
@@ -2776,13 +2804,7 @@
       printArea.innerHTML = printContent;
       printArea.style.display = "block";
       setTimeout(() => {
-        if (window.KasirAlvaNative && window.KasirAlvaNative.printPage) {
-          window.KasirAlvaNative.printPage("Laporan Opname KasirAlva");
-        } else {
-          window.print();
-        }
-        printArea.style.display = "none";
-        printArea.innerHTML = "";
+        triggerNativePrint("Laporan Opname KasirAlva");
       }, 200);
     }
 
@@ -2994,13 +3016,7 @@
       printArea.style.display = "block";
 
       setTimeout(() => {
-        if (window.KasirAlvaNative && window.KasirAlvaNative.printPage) {
-          window.KasirAlvaNative.printPage("Laporan KasirAlva");
-        } else {
-          window.print();
-        }
-        printArea.style.display = "none";
-        printArea.innerHTML = "";
+        triggerNativePrint("Laporan KasirAlva");
       }, 200);
     }
 
