@@ -277,12 +277,12 @@
       background: #fff;
       border: 1px solid #e9ecef;
       border-radius: 10px;
-      padding: 6px;
+      padding: 8px 6px;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      min-height: 60px;
+      min-height: 72px;
       transition: transform 0.1s, box-shadow 0.15s;
     }
     .product-card:active { transform: scale(0.97); }
@@ -316,12 +316,14 @@
       font-size: 12px;
       font-weight: 600;
       color: #222;
-      margin-bottom: 4px;
-      height: 16px;
+      margin: 2px 0 4px;
+      min-height: 16px;
+      line-height: 16px;
       overflow: hidden;
       display: -webkit-box;
-      -webkit-line-clamp: 1;
+      -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
+      word-break: break-word;
     }
     .product-bottom {
       display: flex;
@@ -1118,8 +1120,7 @@
           var nativeProducts = JSON.parse(json);
           if (Array.isArray(nativeProducts) && nativeProducts.length) {
             products = nativeProducts;
-            if (typeof renderPosProducts === "function") renderPosProducts();
-            if (typeof renderCategories === "function") renderCategories();
+            if (typeof renderAll === "function") renderAll();
           }
         }
       } catch (e) {
@@ -1235,7 +1236,7 @@
         if (json && typeof storeSettings !== "undefined") {
           var s = JSON.parse(json);
           Object.keys(s).forEach(function(k){ storeSettings[k] = s[k]; });
-          if (typeof applyStoreSettings === "function") applyStoreSettings();
+          if (typeof renderAll === "function") renderAll();
         }
       } catch(e) {}
     }
@@ -1996,10 +1997,13 @@
     }
 
     function handleBarcode(code) {
-      const product = products.find(p => p.barcode === code || p.barcode.includes(code) || code.includes(p.barcode));
+      const product = products.find(p => {
+        const bc = (p.barcode || "").toString();
+        return bc && (bc === code || bc.includes(code) || code.includes(bc));
+      });
       if (product) {
         addToCart(product.id);
-        showToast("✓ " + product.name + " ditambahkan");
+        showToast("✓ " + (product.name || "Produk") + " ditambahkan");
         // Also put the code in search for visual feedback
         document.getElementById("pos-search").value = code;
         renderPosProducts();
@@ -2151,7 +2155,9 @@
 
       const filtered = products.filter(p => {
         const matchCat = selectedCategory === "Semua" || p.category === selectedCategory;
-        const matchSearch = p.name.toLowerCase().includes(search) || p.barcode.includes(search);
+        const name = (p.name || "").toString();
+        const barcode = (p.barcode || "").toString();
+        const matchSearch = !search || name.toLowerCase().includes(search) || barcode.includes(search);
         return matchCat && matchSearch;
       });
 
@@ -2163,13 +2169,14 @@
 
       grid.innerHTML = filtered.map(p => {
         const isLow = p.stock <= p.minStock;
+        const displayName = (p.name && String(p.name).trim()) ? p.name : "(Tanpa nama)";
         return `
           <div class="product-card" onclick="addToCart('${p.id}')">
             <div class="product-card-top">
               <span class="stock-badge ${isLow ? 'low' : ''}">Stok: ${p.stock}</span>
-              <span class="product-cat">${p.category}</span>
+              <span class="product-cat">${p.category || ""}</span>
             </div>
-            <div class="product-name">${p.name || '(Tanpa nama)'}</div>
+            <div class="product-name">${displayName}</div>
             <div class="product-bottom">
               <span class="product-price">${formatIDR(p.sellPrice)}</span>
               <div class="add-circle"><i class="fas fa-plus" style="font-size:11px;"></i></div>
@@ -2488,9 +2495,11 @@
     // ===================== PRODUCTS =====================
     function renderInventory() {
       const search = document.getElementById("inv-search").value.toLowerCase();
-      const filtered = products.filter(p =>
-        p.name.toLowerCase().includes(search) || p.barcode.includes(search)
-      );
+      const filtered = products.filter(p => {
+        const name = (p.name || "").toString().toLowerCase();
+        const barcode = (p.barcode || "").toString();
+        return !search || name.includes(search) || barcode.includes(search);
+      });
 
       const list = document.getElementById("inventory-list");
       if (filtered.length === 0) {
@@ -2506,8 +2515,8 @@
           <div class="inv-card">
             <div class="inv-header">
               <div>
-                <div class="inv-barcode">Barcode: ${p.barcode}</div>
-                <div class="inv-name">${p.name}</div>
+                <div class="inv-barcode">Barcode: ${p.barcode || "-"}</div>
+                <div class="inv-name">${(p.name && String(p.name).trim()) ? p.name : "(Tanpa nama)"}</div>
               </div>
               <button class="edit-btn" onclick="openProductModal('${p.id}')"><i class="fas fa-pencil-alt"></i></button>
             </div>
@@ -2659,7 +2668,12 @@
       const list = document.getElementById("opname-product-list");
       if (!list) return;
       const q = (filterQ != null ? filterQ : (document.getElementById("opname-modal-search")?.value || "")).trim().toLowerCase();
-      const rows = products.filter(p => !q || p.name.toLowerCase().includes(q) || (p.barcode || "").includes(q));
+      const rows = products.filter(p => {
+        if (!q) return true;
+        const name = (p.name || "").toString().toLowerCase();
+        const barcode = (p.barcode || "").toString();
+        return name.includes(q) || barcode.includes(q);
+      });
       if (rows.length === 0) {
         list.innerHTML = `<div style="padding:16px;text-align:center;color:#999;font-size:13px;">Produk tidak ditemukan</div>`;
         return;
@@ -2667,7 +2681,7 @@
       list.innerHTML = rows.map(p => `
         <div class="opname-batch-row" data-pid="${p.id}">
           <div>
-            <div style="font-weight:600;">${p.name}</div>
+            <div style="font-weight:600;">${(p.name && String(p.name).trim()) ? p.name : "(Tanpa nama)"}</div>
             <div style="font-size:11px;color:#999;">${p.unit || "pcs"}</div>
           </div>
           <div class="opname-batch-sys">${p.stock}</div>
