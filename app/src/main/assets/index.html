@@ -1078,14 +1078,28 @@
       .pos-catalog {
         flex: 1;
         border-right: none;
-        border-bottom: 1px solid var(--border);
+        border-bottom: none;
         min-height: 0;
       }
+      /* Keranjang jadi panel full-screen, bukan split bawah */
       .pos-cart {
-        flex: 0 0 auto;
-        max-height: 55%;
-        min-height: 220px;
+        display: none;
+        position: fixed;
+        left: 0; right: 0; top: 0; bottom: 0;
+        z-index: 90;
+        max-height: none;
+        min-height: 0;
+        flex: none;
+        background: #fff;
+        padding: 12px;
+        padding-top: max(12px, env(safe-area-inset-top));
+        padding-bottom: max(12px, env(safe-area-inset-bottom));
       }
+      body.cart-open .pos-cart {
+        display: flex !important;
+        flex-direction: column;
+      }
+      body.cart-open .bottom-nav { display: none !important; }
       .product-grid {
         grid-template-columns: repeat(2, 1fr);
       }
@@ -1094,7 +1108,85 @@
     @media (max-width: 480px) {
       .product-grid { grid-template-columns: 1fr 1fr; }
       .header-sub { display: none; }
-      .pos-cart { max-height: 55%; min-height: 220px; }
+    }
+
+    /* Ikon keranjang di header */
+    .cart-badge-btn {
+      position: relative;
+      background: #fff;
+      color: var(--primary);
+      border: none;
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .cart-badge-btn .cart-count {
+      position: absolute;
+      top: -4px; right: -4px;
+      background: #fff;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+      font-size: 10px;
+      font-weight: 800;
+      min-width: 18px; height: 18px;
+      border-radius: 10px;
+      display: none;
+      align-items: center; justify-content: center;
+      padding: 0 4px;
+      line-height: 1;
+    }
+    .cart-badge-btn .cart-count.show { display: flex; }
+
+    /* Bar ringkas di bawah katalog saat ada item */
+    .cart-mini-bar {
+      display: none;
+      flex-shrink: 0;
+      margin: 8px 0 0;
+      background: var(--primary);
+      color: #fff;
+      border-radius: 12px;
+      padding: 12px 14px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(218,41,28,0.35);
+    }
+    .cart-mini-bar.show { display: flex; }
+    .cart-mini-bar .mini-left { font-size: 13px; font-weight: 600; }
+    .cart-mini-bar .mini-right {
+      background: #fff; color: var(--primary);
+      font-weight: 800; font-size: 13px;
+      padding: 6px 12px; border-radius: 8px;
+      white-space: nowrap;
+    }
+
+    /* Tombol tutup di panel keranjang (mobile) */
+    .cart-close-btn {
+      display: none;
+      border: none;
+      background: #f1f3f5;
+      color: #333;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      align-items: center; justify-content: center;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    @media (max-width: 900px) {
+      .cart-close-btn { display: flex; }
+    }
+
+    /* Saat keyboard terbuka */
+    body.keyboard-open .cart-mini-bar,
+    body.keyboard-open .bottom-nav {
+      display: none !important;
+    }
+    body.keyboard-open .content {
+      padding-bottom: 0;
     }
   </style>
 
@@ -1364,6 +1456,10 @@
           <i class="fas fa-exclamation-triangle"></i>
           <span id="low-stock-count">0</span>
         </div>
+        <button type="button" class="cart-badge-btn" id="header-cart-btn" onclick="openCartPanel()" title="Keranjang">
+          <i class="fas fa-shopping-cart"></i>
+          <span class="cart-count" id="header-cart-count">0</span>
+        </button>
         <div class="cashier-pill">
           <i class="fas fa-user-circle" style="color:var(--primary)"></i>
           Kasir 1
@@ -1389,10 +1485,17 @@
             </div>
             <div class="cat-scroll" id="category-list"></div>
             <div class="product-grid" id="product-grid"></div>
+            <div class="cart-mini-bar" id="cart-mini-bar" onclick="openCartPanel()">
+              <div class="mini-left"><i class="fas fa-shopping-cart"></i> <span id="mini-cart-label">0 item</span></div>
+              <div class="mini-right" id="mini-cart-total">Rp 0</div>
+            </div>
           </div>
-          <div class="pos-cart">
+          <div class="pos-cart" id="pos-cart-panel">
             <div class="cart-header">
-              <div class="cart-header-title">
+              <button type="button" class="cart-close-btn" onclick="closeCartPanel()" title="Kembali">
+                <i class="fas fa-arrow-left"></i>
+              </button>
+              <div class="cart-header-title" style="flex:1;">
                 <i class="fas fa-shopping-cart" style="color:var(--primary)"></i>
                 Keranjang Belanja
               </div>
@@ -1796,6 +1899,20 @@
     </div>
   </div>
 
+  <!-- Return / Retur Modal -->
+  <div class="modal-overlay" id="return-modal">
+    <div class="modal" style="max-width:420px;">
+      <div class="modal-header">
+        <div class="modal-title">Retur Item</div>
+        <button class="modal-close" onclick="closeModal('return-modal')">&times;</button>
+      </div>
+      <div class="modal-label" style="margin-bottom:8px;color:#666;font-weight:400;">Isi qty yang dikembalikan pembeli. Stok akan bertambah otomatis.</div>
+      <input type="hidden" id="return-tx-id" value="" />
+      <div id="return-modal-body" style="max-height:50vh;overflow-y:auto;"></div>
+      <button class="btn-confirm" style="margin-top:12px;background:#e65100;" onclick="confirmReturn()">PROSES RETUR</button>
+    </div>
+  </div>
+
   <!-- Opname Modal -->
   <div class="modal-overlay" id="opname-modal">
     <div class="modal">
@@ -1897,7 +2014,15 @@
 
     // ===================== UTILS =====================
     function formatIDR(val) {
-      return "Rp " + Math.round(val).toLocaleString("id-ID");
+      return "Rp " + Math.round(Number(val) || 0).toLocaleString("id-ID");
+    }
+
+    function escapeHtml(str) {
+      return String(str == null ? "" : str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
     }
 
     function showToast(msg) {
@@ -2084,12 +2209,15 @@
         return;
       }
 
+      if (typeof closeCartPanel === "function") closeCartPanel();
+
       document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
       document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active"));
       document.getElementById("tab-" + tab).classList.add("active");
-      document.querySelector(`.nav-item[data-tab="${tab}"]`).classList.add("active");
+      const navBtn = document.querySelector(`.nav-item[data-tab="${tab}"]`);
+      if (navBtn) navBtn.classList.add("active");
 
-      if (tab === "pos") renderPosProducts();
+      if (tab === "pos") { renderPosProducts(); renderCart(); }
       if (tab === "products") renderInventory();
       if (tab === "opname") renderOpnames();
       if (tab === "reports") {
@@ -2169,12 +2297,14 @@
 
       grid.innerHTML = filtered.map(p => {
         const isLow = p.stock <= p.minStock;
-        const displayName = (p.name && String(p.name).trim()) ? p.name : "(Tanpa nama)";
+        const displayName = escapeHtml((p.name && String(p.name).trim()) ? p.name : "(Tanpa nama)");
+        const cat = escapeHtml(p.category || "");
+        const safeId = String(p.id || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
         return `
-          <div class="product-card" onclick="addToCart('${p.id}')">
+          <div class="product-card" onclick="addToCart('${safeId}')">
             <div class="product-card-top">
               <span class="stock-badge ${isLow ? 'low' : ''}">Stok: ${p.stock}</span>
-              <span class="product-cat">${p.category || ""}</span>
+              <span class="product-cat">${cat}</span>
             </div>
             <div class="product-name">${displayName}</div>
             <div class="product-bottom">
@@ -2240,6 +2370,42 @@
       return Math.max(0, getCartSubtotal() - cartDiscount);
     }
 
+    function getCartItemCount() {
+      return cart.reduce((s, i) => s + (Number(i.quantity) || 0), 0);
+    }
+
+    function updateCartBadges() {
+      const count = getCartItemCount();
+      const total = getCartFinal();
+
+      const badge = document.getElementById("header-cart-count");
+      if (badge) {
+        badge.textContent = count > 99 ? "99+" : String(count);
+        badge.classList.toggle("show", count > 0);
+      }
+
+      const mini = document.getElementById("cart-mini-bar");
+      const miniLabel = document.getElementById("mini-cart-label");
+      const miniTotal = document.getElementById("mini-cart-total");
+      if (mini) {
+        // Hanya tampil di layar sempit (keranjang terpisah)
+        const isMobile = window.matchMedia && window.matchMedia("(max-width: 900px)").matches;
+        mini.classList.toggle("show", isMobile && count > 0 && !document.body.classList.contains("cart-open"));
+      }
+      if (miniLabel) miniLabel.textContent = count + (count === 1 ? " item" : " item");
+      if (miniTotal) miniTotal.textContent = formatIDR(total);
+    }
+
+    function openCartPanel() {
+      document.body.classList.add("cart-open");
+      updateCartBadges();
+    }
+
+    function closeCartPanel() {
+      document.body.classList.remove("cart-open");
+      updateCartBadges();
+    }
+
     function renderCart() {
       const container = document.getElementById("cart-items");
       const footer = document.getElementById("cart-footer");
@@ -2252,22 +2418,28 @@
           </div>
         `;
         footer.style.display = "none";
+        document.body.classList.remove("cart-open");
+        updateCartBadges();
         return;
       }
 
-      container.innerHTML = cart.map(item => `
+      container.innerHTML = cart.map(item => {
+        const unit = item.product.unit || "pcs";
+        const lineTotal = item.product.sellPrice * item.quantity;
+        return `
         <div class="cart-item">
           <div class="cart-item-info">
-            <div class="cart-item-name">${item.product.name}</div>
-            <div class="cart-item-price">${formatIDR(item.product.sellPrice)}</div>
+            <div class="cart-item-name">${escapeHtml(item.product.name || "")}</div>
+            <div class="cart-item-price">${item.quantity} ${unit} × @ ${formatIDR(item.product.sellPrice)} = ${formatIDR(lineTotal)}</div>
           </div>
           <div class="qty-control">
-            <button class="qty-btn" onclick="updateCartQty('${item.product.id}', -1)"><i class="fas fa-minus"></i></button>
+            <button class="qty-btn" onclick="updateCartQty('${String(item.product.id).replace(/'/g, "\\'")}', -1)"><i class="fas fa-minus"></i></button>
             <span class="qty-text">${item.quantity}</span>
-            <button class="qty-btn" onclick="updateCartQty('${item.product.id}', 1)"><i class="fas fa-plus"></i></button>
+            <button class="qty-btn" onclick="updateCartQty('${String(item.product.id).replace(/'/g, "\\'")}', 1)"><i class="fas fa-plus"></i></button>
           </div>
         </div>
-      `).join("");
+      `;
+      }).join("");
 
       footer.style.display = "block";
       document.getElementById("cart-subtotal").textContent = formatIDR(getCartSubtotal());
@@ -2279,6 +2451,7 @@
       } else {
         document.getElementById("discount-row").style.display = "none";
       }
+      updateCartBadges();
     }
 
     // ===================== CHECKOUT =====================
@@ -2344,7 +2517,9 @@
         paymentMethod,
         cashReceived: paymentMethod === "CASH" ? cashNum : finalTotal,
         change: changeNum,
-        cashierName: "Kasir Utama (Alva Store)"
+        cashierName: storeSettings.cashierName || "Kasir 1",
+        status: "COMPLETED",
+        returns: []
       };
 
       // Update stock
@@ -2360,6 +2535,7 @@
 
       saveState();
       closeModal("checkout-modal");
+      closeCartPanel();
       renderCart();
       renderPosProducts();
       updateLowStockAlert();
@@ -2374,13 +2550,20 @@
       document.getElementById("receipt-date").textContent = tx.date;
       document.getElementById("receipt-no").textContent = tx.receiptNo;
 
-      document.getElementById("receipt-items").innerHTML = tx.items.map(it => `
-        <div class="receipt-item">
-          <span class="name">${it.product.name}</span>
-          <span class="qty">${it.quantity}x</span>
-          <span class="price">${formatIDR(it.product.sellPrice * it.quantity)}</span>
+      document.getElementById("receipt-items").innerHTML = tx.items.map(it => {
+        const unit = (it.product && it.product.unit) ? it.product.unit : "pcs";
+        const price = (it.product && it.product.sellPrice) ? it.product.sellPrice : 0;
+        const name = (it.product && it.product.name) ? it.product.name : "-";
+        return `
+        <div class="receipt-item" style="flex-direction:column;align-items:stretch;gap:2px;">
+          <div style="font-weight:600;">${escapeHtml(name)}</div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:#444;">
+            <span>${it.quantity} ${unit} × @ ${formatIDR(price)}</span>
+            <span style="font-weight:600;">${formatIDR(price * it.quantity)}</span>
+          </div>
         </div>
-      `).join("");
+      `;
+      }).join("");
 
       let summary = `
         <div class="receipt-row"><span>Subtotal</span><span>${formatIDR(tx.subtotal)}</span></div>
@@ -2435,13 +2618,18 @@
       if (!lastTransaction) return;
       const tx = lastTransaction;
 
-      let itemsHtml = tx.items.map(it => 
-        `<div style="display:flex;justify-content:space-between;margin-bottom:3px;font-size:12px;">
-          <span style="flex:2">${it.product.name}</span>
-          <span style="flex:0.8;text-align:center">${it.quantity}x</span>
-          <span style="flex:1.2;text-align:right">${formatIDR(it.product.sellPrice * it.quantity)}</span>
-        </div>`
-      ).join("");
+      let itemsHtml = tx.items.map(it => {
+        const unit = (it.product && it.product.unit) ? it.product.unit : "pcs";
+        const price = (it.product && it.product.sellPrice) ? it.product.sellPrice : 0;
+        const name = (it.product && it.product.name) ? it.product.name : "-";
+        return `<div style="margin-bottom:6px;font-size:12px;">
+          <div style="font-weight:600;">${name}</div>
+          <div style="display:flex;justify-content:space-between;">
+            <span>${it.quantity} ${unit} × @ ${formatIDR(price)}</span>
+            <span style="font-weight:600;">${formatIDR(price * it.quantity)}</span>
+          </div>
+        </div>`;
+      }).join("");
 
       let discountLine = tx.discount > 0 
         ? `<div style="display:flex;justify-content:space-between;"><span>Diskon</span><span>-${formatIDR(tx.discount)}</span></div>` 
@@ -2877,17 +3065,180 @@
       document.querySelectorAll("#report-presets .cat-chip").forEach(el => el.classList.remove("active"));
     }
 
+    function getTxReturnedQty(tx, productId) {
+      if (!tx.returns || !tx.returns.length) return 0;
+      return tx.returns
+        .filter(r => r.productId === productId)
+        .reduce((s, r) => s + (Number(r.quantity) || 0), 0);
+    }
+
+    function getTxReturnAmount(tx) {
+      if (!tx.returns || !tx.returns.length) return 0;
+      return tx.returns.reduce((s, r) => s + (Number(r.amount) || 0), 0);
+    }
+
+    function getTxNetTotal(tx) {
+      if (tx.status === "VOIDED") return 0;
+      return Math.max(0, (Number(tx.total) || 0) - getTxReturnAmount(tx));
+    }
+
+    function getTxNetProfit(tx) {
+      if (tx.status === "VOIDED") return 0;
+      const retAmt = getTxReturnAmount(tx);
+      // perkiraan: kurangi laba proporsional terhadap retur
+      const total = Number(tx.total) || 0;
+      const profit = Number(tx.profit) || 0;
+      if (total <= 0) return 0;
+      const ratio = Math.max(0, (total - retAmt) / total);
+      return Math.round(profit * ratio);
+    }
+
+    function getTxNetHPP(tx) {
+      if (tx.status === "VOIDED") return 0;
+      const total = Number(tx.total) || 0;
+      const hpp = Number(tx.totalBuyPrice) || 0;
+      if (total <= 0) return 0;
+      const retAmt = getTxReturnAmount(tx);
+      return Math.round(hpp * Math.max(0, (total - retAmt) / total));
+    }
+
+    function voidTransaction(txId) {
+      const tx = transactions.find(t => t.id === txId);
+      if (!tx) return;
+      if (tx.status === "VOIDED") {
+        showToast("Transaksi ini sudah dibatalkan");
+        return;
+      }
+      if (!confirm("Batalkan SELURUH transaksi " + tx.receiptNo + "?\n\n• Stok semua item akan dikembalikan\n• Omzet transaksi ini jadi Rp 0\n• Data tetap ada di laporan (status BATAL)")) {
+        return;
+      }
+
+      // Kembalikan stok: qty asli - yang sudah diretur
+      (tx.items || []).forEach(it => {
+        const pid = it.product && it.product.id;
+        if (!pid) return;
+        const alreadyReturned = getTxReturnedQty(tx, pid);
+        const restoreQty = Math.max(0, (Number(it.quantity) || 0) - alreadyReturned);
+        const p = products.find(pr => pr.id === pid);
+        if (p && restoreQty > 0) p.stock = (Number(p.stock) || 0) + restoreQty;
+      });
+
+      tx.status = "VOIDED";
+      tx.voidedAt = new Date().toISOString().replace("T", " ").substring(0, 19);
+      saveState();
+      renderReports();
+      renderPosProducts();
+      updateLowStockAlert();
+      showToast("Transaksi dibatalkan. Stok dikembalikan.");
+    }
+
+    function openReturnModal(txId) {
+      const tx = transactions.find(t => t.id === txId);
+      if (!tx) return;
+      if (tx.status === "VOIDED") {
+        showToast("Transaksi sudah batal — tidak bisa retur");
+        return;
+      }
+
+      const rows = (tx.items || []).map(it => {
+        const pid = it.product.id;
+        const returned = getTxReturnedQty(tx, pid);
+        const maxQty = Math.max(0, (Number(it.quantity) || 0) - returned);
+        if (maxQty <= 0) return "";
+        return `
+          <div class="return-row" data-pid="${pid}" style="display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid #eee;">
+            <div style="flex:1;min-width:0;">
+              <div style="font-weight:600;font-size:13px;">${escapeHtml(it.product.name || "")}</div>
+              <div style="font-size:11px;color:#888;">Max retur: ${maxQty} · @ ${formatIDR(it.product.sellPrice)}</div>
+            </div>
+            <input type="number" min="0" max="${maxQty}" value="0" class="modal-input return-qty"
+              style="width:70px;height:36px;margin:0;text-align:center;" data-max="${maxQty}" data-price="${it.product.sellPrice}" data-pid="${pid}" data-name="${escapeHtml(it.product.name || "")}" />
+          </div>`;
+      }).join("");
+
+      if (!rows.replace(/\s/g, "")) {
+        showToast("Semua item sudah diretur");
+        return;
+      }
+
+      const body = document.getElementById("return-modal-body");
+      if (body) body.innerHTML = rows;
+      const hid = document.getElementById("return-tx-id");
+      if (hid) hid.value = txId;
+      document.getElementById("return-modal").classList.add("show");
+    }
+
+    function confirmReturn() {
+      const txId = document.getElementById("return-tx-id").value;
+      const tx = transactions.find(t => t.id === txId);
+      if (!tx) return;
+
+      const inputs = document.querySelectorAll("#return-modal-body .return-qty");
+      const toReturn = [];
+      inputs.forEach(inp => {
+        let qty = parseInt(inp.value, 10) || 0;
+        const max = parseInt(inp.dataset.max, 10) || 0;
+        if (qty < 0) qty = 0;
+        if (qty > max) qty = max;
+        if (qty > 0) {
+          const price = parseFloat(inp.dataset.price) || 0;
+          toReturn.push({
+            productId: inp.dataset.pid,
+            name: inp.dataset.name || "",
+            quantity: qty,
+            amount: price * qty,
+            date: new Date().toISOString().replace("T", " ").substring(0, 19)
+          });
+        }
+      });
+
+      if (toReturn.length === 0) {
+        showToast("Isi qty retur minimal 1");
+        return;
+      }
+
+      const totalRetur = toReturn.reduce((s, r) => s + r.amount, 0);
+      if (!confirm("Proses retur " + toReturn.length + " item?\nTotal dikembalikan: " + formatIDR(totalRetur))) {
+        return;
+      }
+
+      if (!tx.returns) tx.returns = [];
+      toReturn.forEach(r => {
+        tx.returns.push(r);
+        const p = products.find(pr => pr.id === r.productId);
+        if (p) p.stock = (Number(p.stock) || 0) + r.quantity;
+      });
+
+      // Jika semua item sudah diretur penuh → tandai void
+      const allReturned = (tx.items || []).every(it => {
+        const pid = it.product.id;
+        return getTxReturnedQty(tx, pid) >= (Number(it.quantity) || 0);
+      });
+      if (allReturned) {
+        tx.status = "VOIDED";
+        tx.voidedAt = new Date().toISOString().replace("T", " ").substring(0, 19);
+      }
+
+      saveState();
+      closeModal("return-modal");
+      renderReports();
+      renderPosProducts();
+      updateLowStockAlert();
+      showToast("Retur berhasil. Stok & omzet diperbarui.");
+    }
+
     function renderReports() {
       const filtered = getFilteredTransactions();
-      const totalOmzet = filtered.reduce((s, t) => s + t.total, 0);
-      const totalProfit = filtered.reduce((s, t) => s + t.profit, 0);
-      const totalHPP = filtered.reduce((s, t) => s + (t.totalBuyPrice || 0), 0);
-      const avgTx = filtered.length > 0 ? totalOmzet / filtered.length : 0;
+      const active = filtered.filter(t => t.status !== "VOIDED");
+      const totalOmzet = filtered.reduce((s, t) => s + getTxNetTotal(t), 0);
+      const totalProfit = filtered.reduce((s, t) => s + getTxNetProfit(t), 0);
+      const totalHPP = filtered.reduce((s, t) => s + getTxNetHPP(t), 0);
+      const avgTx = active.length > 0 ? totalOmzet / active.length : 0;
       const marginPct = totalOmzet > 0 ? ((totalProfit / totalOmzet) * 100).toFixed(1) : "0";
 
       document.getElementById("report-omzet").textContent = formatIDR(totalOmzet);
       document.getElementById("report-profit").textContent = formatIDR(totalProfit);
-      document.getElementById("report-txcount").textContent = filtered.length + " transaksi";
+      document.getElementById("report-txcount").textContent = active.length + " aktif / " + filtered.length + " total";
       document.getElementById("report-margin").textContent = "Margin " + marginPct + "%";
       document.getElementById("report-avg").textContent = formatIDR(avgTx);
       document.getElementById("report-hpp").textContent = formatIDR(totalHPP);
@@ -2912,32 +3263,63 @@
         return;
       }
 
-      list.innerHTML = filtered.map(tx => `
-        <div class="tx-card">
+      list.innerHTML = filtered.map(tx => {
+        const isVoid = tx.status === "VOIDED";
+        const retAmt = getTxReturnAmount(tx);
+        const net = getTxNetTotal(tx);
+        const statusBadge = isVoid
+          ? `<span style="background:#ffebee;color:#c62828;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;">BATAL</span>`
+          : (retAmt > 0
+            ? `<span style="background:#fff3e0;color:#e65100;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;">ADA RETUR</span>`
+            : `<span style="background:#e8f5e9;color:#2e7d32;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;">SELESAI</span>`);
+
+        const itemsHtml = (tx.items || []).map(it => {
+          const retQ = getTxReturnedQty(tx, it.product.id);
+          const retNote = retQ > 0 ? ` <span style="color:#e65100;">(retur ${retQ})</span>` : "";
+          return `• ${escapeHtml(it.product.name || "")} (${it.quantity}x)${retNote} - ${formatIDR((it.product.sellPrice || 0) * it.quantity)}`;
+        }).join("<br>");
+
+        const returnsHtml = (tx.returns && tx.returns.length)
+          ? `<div style="margin-top:6px;font-size:11px;color:#e65100;">Retur: ${tx.returns.map(r => `${escapeHtml(r.name)} ${r.quantity}x (−${formatIDR(r.amount)})`).join(", ")}</div>`
+          : "";
+
+        const actions = isVoid ? "" : `
+          <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">
+            <button type="button" onclick="openReturnModal('${tx.id}')" style="flex:1;min-width:100px;height:34px;border:1px solid #ffcc80;background:#fff8e1;color:#e65100;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">
+              <i class="fas fa-undo"></i> Retur Item
+            </button>
+            <button type="button" onclick="voidTransaction('${tx.id}')" style="flex:1;min-width:100px;height:34px;border:1px solid #ef9a9a;background:#ffebee;color:#c62828;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">
+              <i class="fas fa-ban"></i> Batalkan
+            </button>
+          </div>`;
+
+        return `
+        <div class="tx-card" style="${isVoid ? "opacity:0.75;border-color:#ef9a9a;" : ""}">
           <div class="tx-header">
-            <span class="tx-no">${tx.receiptNo}</span>
-            <span class="tx-date">${tx.date}</span>
+            <span class="tx-no">${escapeHtml(tx.receiptNo || "")}</span>
+            <span class="tx-date">${escapeHtml(tx.date || "")}</span>
           </div>
-          <div class="tx-items">
-            ${tx.items.map(it => `• ${it.product.name} (${it.quantity}x) - ${formatIDR(it.product.sellPrice * it.quantity)}`).join("<br>")}
-          </div>
+          <div style="margin:4px 0 6px;">${statusBadge}</div>
+          <div class="tx-items">${itemsHtml}${returnsHtml}</div>
           <div class="tx-footer">
             <div>
-              <div class="tx-profit">Laba: <span style="color:var(--success);font-weight:bold">+${formatIDR(tx.profit)}</span></div>
-              <span class="tx-pay-tag">${tx.paymentMethod}</span>
+              <div class="tx-profit">Laba: <span style="color:var(--success);font-weight:bold">+${formatIDR(getTxNetProfit(tx))}</span></div>
+              <span class="tx-pay-tag">${escapeHtml(tx.paymentMethod || "")}</span>
             </div>
-            <div class="tx-total">${formatIDR(tx.total)}</div>
+            <div class="tx-total" style="${isVoid || retAmt > 0 ? "color:#c62828;" : ""}">${isVoid ? "Rp 0" : formatIDR(net)}${retAmt > 0 && !isVoid ? `<div style="font-size:10px;font-weight:400;color:#888;">asli ${formatIDR(tx.total)}</div>` : ""}</div>
           </div>
-        </div>
-      `).join("");
+          ${actions}
+        </div>`;
+      }).join("");
     }
 
     function printReport() {
       const filtered = getFilteredTransactions();
-      const totalOmzet = filtered.reduce((s, t) => s + t.total, 0);
-      const totalProfit = filtered.reduce((s, t) => s + t.profit, 0);
-      const totalHPP = filtered.reduce((s, t) => s + (t.totalBuyPrice || 0), 0);
-      const avgTx = filtered.length > 0 ? totalOmzet / filtered.length : 0;
+      const active = filtered.filter(t => t.status !== "VOIDED");
+      const totalOmzet = filtered.reduce((s, t) => s + getTxNetTotal(t), 0);
+      const totalProfit = filtered.reduce((s, t) => s + getTxNetProfit(t), 0);
+      const totalHPP = filtered.reduce((s, t) => s + getTxNetHPP(t), 0);
+      const avgTx = active.length > 0 ? totalOmzet / active.length : 0;
       const marginPct = totalOmzet > 0 ? ((totalProfit / totalOmzet) * 100).toFixed(1) : "0";
 
       const fromVal = document.getElementById("report-from").value;
@@ -2955,12 +3337,13 @@
         rows = `<tr><td colspan="5" style="text-align:center;padding:12px;color:#888;">Tidak ada transaksi</td></tr>`;
       } else {
         filtered.forEach((tx, i) => {
+          const st = tx.status === "VOIDED" ? "BATAL" : (getTxReturnAmount(tx) > 0 ? "RETUR" : "OK");
           rows += `<tr>
             <td style="padding:6px 4px;border-bottom:1px solid #ddd;font-size:11px;">${i + 1}</td>
-            <td style="padding:6px 4px;border-bottom:1px solid #ddd;font-size:11px;">${tx.receiptNo}<br><span style="color:#666;">${tx.date}</span></td>
+            <td style="padding:6px 4px;border-bottom:1px solid #ddd;font-size:11px;">${tx.receiptNo} [${st}]<br><span style="color:#666;">${tx.date}</span></td>
             <td style="padding:6px 4px;border-bottom:1px solid #ddd;font-size:11px;">${tx.paymentMethod}</td>
-            <td style="padding:6px 4px;border-bottom:1px solid #ddd;font-size:11px;text-align:right;">${formatIDR(tx.total)}</td>
-            <td style="padding:6px 4px;border-bottom:1px solid #ddd;font-size:11px;text-align:right;color:#2E7D32;">${formatIDR(tx.profit)}</td>
+            <td style="padding:6px 4px;border-bottom:1px solid #ddd;font-size:11px;text-align:right;">${formatIDR(getTxNetTotal(tx))}</td>
+            <td style="padding:6px 4px;border-bottom:1px solid #ddd;font-size:11px;text-align:right;color:#2E7D32;">${formatIDR(getTxNetProfit(tx))}</td>
           </tr>`;
         });
       }
@@ -3255,6 +3638,44 @@
       }
     });
 
+    // ===================== KEYBOARD (hindari keranjang terdorong) =====================
+    function setupKeyboardAwareLayout() {
+      const threshold = 120; // px — beda tinggi viewport vs window
+      let keyboardOpen = false;
+
+      function setOpen(open) {
+        if (keyboardOpen === open) return;
+        keyboardOpen = open;
+        document.body.classList.toggle("keyboard-open", open);
+      }
+
+      function check() {
+        try {
+          if (window.visualViewport) {
+            const covered = window.innerHeight - window.visualViewport.height;
+            setOpen(covered > threshold);
+          }
+        } catch (e) { /* ignore */ }
+      }
+
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener("resize", check);
+        window.visualViewport.addEventListener("scroll", check);
+      }
+      window.addEventListener("resize", check);
+
+      // Fokus di search → anggap keyboard terbuka (fallback)
+      ["pos-search", "inv-search", "opname-search", "opname-modal-search"].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener("focus", () => setOpen(true));
+        el.addEventListener("blur", () => {
+          // Delay sedikit biar cek visualViewport sempat update
+          setTimeout(check, 280);
+        });
+      });
+    }
+
     // ===================== INIT =====================
     function init() {
       loadState();
@@ -3262,6 +3683,7 @@
       renderPosProducts();
       renderCart();
       updateLowStockAlert();
+      setupKeyboardAwareLayout();
     }
 
     init();

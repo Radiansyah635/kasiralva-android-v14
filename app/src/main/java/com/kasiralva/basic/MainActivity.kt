@@ -254,7 +254,16 @@ class MainActivity : ComponentActivity() {
                 val list = mutableListOf<TransactionEntity>()
                 for (i in 0 until arr.length()) {
                     val t = arr.getJSONObject(i)
-                    val items = t.optJSONArray("items")?.toString() ?: "[]"
+                    // Simpan items + meta (status, returns, profit) dalam satu JSON
+                    // agar void/retur tidak hilang saat reload (tanpa migrasi Room).
+                    val bundle = JSONObject().apply {
+                        put("lines", t.optJSONArray("items") ?: JSONArray())
+                        put("status", t.optString("status", "COMPLETED"))
+                        put("returns", t.optJSONArray("returns") ?: JSONArray())
+                        put("profit", t.optLong("profit"))
+                        put("totalBuyPrice", t.optLong("totalBuyPrice"))
+                        put("cashierName", t.optString("cashierName", ""))
+                    }
                     list += TransactionEntity(
                         id = t.optString("id").ifBlank { "tx_${System.currentTimeMillis()}_$i" },
                         receiptNo = t.optString("receiptNo"),
@@ -265,7 +274,7 @@ class MainActivity : ComponentActivity() {
                         paymentMethod = t.optString("paymentMethod", "CASH"),
                         paid = t.optLong("cashReceived", t.optLong("paid")),
                         changeAmount = t.optLong("change", t.optLong("changeAmount")),
-                        itemsJson = items,
+                        itemsJson = bundle.toString(),
                         createdAt = t.optLong("createdAt", System.currentTimeMillis())
                     )
                 }
@@ -296,8 +305,25 @@ class MainActivity : ComponentActivity() {
                             put("paid", t.paid)
                             put("change", t.changeAmount)
                             put("changeAmount", t.changeAmount)
-                            put("items", JSONArray(t.itemsJson))
                             put("createdAt", t.createdAt)
+
+                            // Kompatibel: format lama = array items; format baru = {lines, status, returns, ...}
+                            val raw = t.itemsJson.trim()
+                            if (raw.startsWith("{")) {
+                                val bundle = JSONObject(raw)
+                                put("items", bundle.optJSONArray("lines") ?: JSONArray())
+                                put("status", bundle.optString("status", "COMPLETED"))
+                                put("returns", bundle.optJSONArray("returns") ?: JSONArray())
+                                put("profit", bundle.optLong("profit"))
+                                put("totalBuyPrice", bundle.optLong("totalBuyPrice"))
+                                put("cashierName", bundle.optString("cashierName", ""))
+                            } else {
+                                put("items", JSONArray(if (raw.isBlank()) "[]" else raw))
+                                put("status", "COMPLETED")
+                                put("returns", JSONArray())
+                                put("profit", 0)
+                                put("totalBuyPrice", 0)
+                            }
                         })
                     }
                 }.toString()
@@ -555,7 +581,20 @@ class MainActivity : ComponentActivity() {
                             put("paid", t.paid)
                             put("cashReceived", t.paid)
                             put("change", t.changeAmount)
-                            put("items", JSONArray(t.itemsJson))
+                            val raw = t.itemsJson.trim()
+                            if (raw.startsWith("{")) {
+                                val bundle = JSONObject(raw)
+                                put("items", bundle.optJSONArray("lines") ?: JSONArray())
+                                put("status", bundle.optString("status", "COMPLETED"))
+                                put("returns", bundle.optJSONArray("returns") ?: JSONArray())
+                                put("profit", bundle.optLong("profit"))
+                                put("totalBuyPrice", bundle.optLong("totalBuyPrice"))
+                                put("cashierName", bundle.optString("cashierName", ""))
+                            } else {
+                                put("items", JSONArray(if (raw.isBlank()) "[]" else raw))
+                                put("status", "COMPLETED")
+                                put("returns", JSONArray())
+                            }
                         })
                     }
                 })
@@ -629,6 +668,14 @@ class MainActivity : ComponentActivity() {
                     val ta = root.optJSONArray("transactions") ?: JSONArray()
                     for (i in 0 until ta.length()) {
                         val t = ta.getJSONObject(i)
+                        val bundle = JSONObject().apply {
+                            put("lines", t.optJSONArray("items") ?: JSONArray())
+                            put("status", t.optString("status", "COMPLETED"))
+                            put("returns", t.optJSONArray("returns") ?: JSONArray())
+                            put("profit", t.optLong("profit"))
+                            put("totalBuyPrice", t.optLong("totalBuyPrice"))
+                            put("cashierName", t.optString("cashierName", ""))
+                        }
                         tx += TransactionEntity(
                             id = t.optString("id"),
                             receiptNo = t.optString("receiptNo"),
@@ -639,7 +686,7 @@ class MainActivity : ComponentActivity() {
                             paymentMethod = t.optString("paymentMethod", "CASH"),
                             paid = t.optLong("paid", t.optLong("cashReceived")),
                             changeAmount = t.optLong("change", t.optLong("changeAmount")),
-                            itemsJson = t.optJSONArray("items")?.toString() ?: "[]"
+                            itemsJson = bundle.toString()
                         )
                     }
 
