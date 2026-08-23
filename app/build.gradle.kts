@@ -23,11 +23,16 @@ android {
             val ksPass = System.getenv("KASIRALVA_KEYSTORE_PASSWORD")
             val alias = System.getenv("KASIRALVA_KEY_ALIAS")
             val keyPass = System.getenv("KASIRALVA_KEY_PASSWORD")
+            // Hanya set jika path ada — job CI sudah validasi secret sebelumnya
             if (!ksPath.isNullOrBlank()) {
-                storeFile = file(ksPath)
-                storePassword = ksPass
-                keyAlias = alias
-                keyPassword = keyPass
+                val f = file(ksPath)
+                require(f.exists()) {
+                    "Keystore tidak ditemukan di path: $ksPath"
+                }
+                storeFile = f
+                storePassword = ksPass ?: error("KASIRALVA_KEYSTORE_PASSWORD kosong")
+                keyAlias = alias ?: error("KASIRALVA_KEY_ALIAS kosong")
+                keyPassword = keyPass ?: error("KASIRALVA_KEY_PASSWORD kosong")
             }
         }
     }
@@ -35,7 +40,11 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            signingConfig = signingConfigs.getByName("release")
+            // Pakai signing release hanya jika keystore path di-set (CI release job)
+            val ksPath = System.getenv("KASIRALVA_KEYSTORE_PATH")
+            if (!ksPath.isNullOrBlank()) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
 
