@@ -42,7 +42,6 @@ jobs:
   build-release:
     name: Build Release APK
     runs-on: ubuntu-latest
-    # Jalan jika variable HAS_RELEASE_KEYSTORE=true ATAU dijalankan manual (Run workflow)
     if: ${{ vars.HAS_RELEASE_KEYSTORE == 'true' || github.event_name == 'workflow_dispatch' }}
 
     steps:
@@ -64,20 +63,25 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
+      # Secret names match existing repo secrets:
+      #   KASIRALVA_KEYSTORE_BASE64
+      #   KEYSTORE_PASSWORD
+      #   KEY_ALIAS
+      #   KEY_PASSWORD
       - name: Check release secrets
         env:
           KS_B64: ${{ secrets.KASIRALVA_KEYSTORE_BASE64 }}
-          KS_PASS: ${{ secrets.KASIRALVA_KEYSTORE_PASSWORD }}
-          KS_ALIAS: ${{ secrets.KASIRALVA_KEY_ALIAS }}
-          KEY_PASS: ${{ secrets.KASIRALVA_KEY_PASSWORD }}
+          KS_PASS: ${{ secrets.KEYSTORE_PASSWORD }}
+          KS_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASS: ${{ secrets.KEY_PASSWORD }}
         run: |
           missing=0
           if [ -z "$KS_B64" ]; then echo "::error::Secret KASIRALVA_KEYSTORE_BASE64 kosong"; missing=1; fi
-          if [ -z "$KS_PASS" ]; then echo "::error::Secret KASIRALVA_KEYSTORE_PASSWORD kosong"; missing=1; fi
-          if [ -z "$KS_ALIAS" ]; then echo "::error::Secret KASIRALVA_KEY_ALIAS kosong"; missing=1; fi
-          if [ -z "$KEY_PASS" ]; then echo "::error::Secret KASIRALVA_KEY_PASSWORD kosong"; missing=1; fi
+          if [ -z "$KS_PASS" ]; then echo "::error::Secret KEYSTORE_PASSWORD kosong"; missing=1; fi
+          if [ -z "$KS_ALIAS" ]; then echo "::error::Secret KEY_ALIAS kosong"; missing=1; fi
+          if [ -z "$KEY_PASS" ]; then echo "::error::Secret KEY_PASSWORD kosong"; missing=1; fi
           if [ "$missing" = "1" ]; then
-            echo "Isi 4 secret di: Settings → Secrets and variables → Actions"
+            echo "Isi secret di: Settings → Secrets and variables → Actions"
             exit 1
           fi
           echo "Semua secret release terdeteksi."
@@ -86,29 +90,27 @@ jobs:
         env:
           KS_B64: ${{ secrets.KASIRALVA_KEYSTORE_BASE64 }}
         run: |
-          # Buang whitespace/newline yang sering bikin base64 gagal
           echo "$KS_B64" | tr -d '\n\r\t ' | base64 -d > kasiralva-release.keystore
           if [ ! -s kasiralva-release.keystore ]; then
             echo "::error::Gagal decode keystore (file kosong). Cek KASIRALVA_KEYSTORE_BASE64."
             exit 1
           fi
-          # Cek magic bytes keystore (JKS / PKCS12)
           file kasiralva-release.keystore || true
           ls -la kasiralva-release.keystore
           echo "Keystore decoded OK ($(wc -c < kasiralva-release.keystore) bytes)"
 
       - name: Verify keystore unlock
         env:
-          KASIRALVA_KEYSTORE_PASSWORD: ${{ secrets.KASIRALVA_KEYSTORE_PASSWORD }}
-          KASIRALVA_KEY_ALIAS: ${{ secrets.KASIRALVA_KEY_ALIAS }}
-          KASIRALVA_KEY_PASSWORD: ${{ secrets.KASIRALVA_KEY_PASSWORD }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           keytool -list \
             -keystore kasiralva-release.keystore \
-            -storepass "$KASIRALVA_KEYSTORE_PASSWORD" \
-            -alias "$KASIRALVA_KEY_ALIAS" \
-            -keypass "$KASIRALVA_KEY_PASSWORD" || {
-              echo "::error::Password / alias keystore salah. Cek KASIRALVA_KEYSTORE_PASSWORD, KASIRALVA_KEY_ALIAS, KASIRALVA_KEY_PASSWORD."
+            -storepass "$KEYSTORE_PASSWORD" \
+            -alias "$KEY_ALIAS" \
+            -keypass "$KEY_PASSWORD" || {
+              echo "::error::Password / alias keystore salah. Cek KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD."
               exit 1
             }
           echo "Keystore bisa dibuka — alias OK."
@@ -116,9 +118,9 @@ jobs:
       - name: Build Release APK
         env:
           KASIRALVA_KEYSTORE_PATH: ${{ github.workspace }}/kasiralva-release.keystore
-          KASIRALVA_KEYSTORE_PASSWORD: ${{ secrets.KASIRALVA_KEYSTORE_PASSWORD }}
-          KASIRALVA_KEY_ALIAS: ${{ secrets.KASIRALVA_KEY_ALIAS }}
-          KASIRALVA_KEY_PASSWORD: ${{ secrets.KASIRALVA_KEY_PASSWORD }}
+          KASIRALVA_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KASIRALVA_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KASIRALVA_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: ./gradlew assembleRelease --stacktrace --no-daemon
 
       - name: Remove keystore file
