@@ -1580,7 +1580,7 @@
             <i class="fas fa-chevron-right" style="color:#aaa;"></i>
           </div>
 
-          <div class="setting-card" style="cursor:pointer;" onclick="document.getElementById('import-file').click()">
+          <div class="setting-card" style="cursor:pointer;" onclick="startImportData()">
             <i class="fas fa-upload" style="font-size:22px;color:var(--success);"></i>
             <div style="flex:1;">
               <div class="setting-title">Import / Pulihkan Data</div>
@@ -1588,7 +1588,7 @@
             </div>
             <i class="fas fa-chevron-right" style="color:#aaa;"></i>
           </div>
-          <input type="file" id="import-file" accept=".json,application/json" style="display:none;" onchange="importData(event)" />
+          <input type="file" id="import-file" accept=".json,application/json,*/*" style="display:none;" onchange="importData(event)" />
 
           <div class="setting-card" style="cursor:pointer;" onclick="clearTransactions()">
             <i class="fas fa-trash-alt" style="font-size:22px;color:#F57C00;"></i>
@@ -3130,14 +3130,35 @@
       }
     }
 
+    function startImportData() {
+      // Prioritas: native restore (file picker Android, lebih andal)
+      if (window.KasirAlvaNative && window.KasirAlvaNative.requestRestore) {
+        try {
+          if (!confirm("Import akan mengganti data produk, transaksi & opname saat ini.\nPastikan file backup benar. Lanjutkan?")) {
+            return;
+          }
+          window.KasirAlvaNative.requestRestore();
+          showToast("Pilih file backup JSON...");
+          return;
+        } catch (e) {
+          console.warn("Native restore failed, fallback file input", e);
+        }
+      }
+      // Fallback: <input type="file"> (butuh onShowFileChooser di native)
+      const el = document.getElementById("import-file");
+      if (el) el.click();
+    }
+
     function importData(event) {
-      const file = event.target.files[0];
+      const file = event.target.files && event.target.files[0];
       if (!file) return;
       const reader = new FileReader();
       reader.onload = function(e) {
         try {
           const data = JSON.parse(e.target.result);
-          if (!data.products || !Array.isArray(data.products)) {
+          // Terima format export HTML maupun native (ada field app/products)
+          const productList = data.products;
+          if (!productList || !Array.isArray(productList)) {
             showToast("File backup tidak valid atau bukan format KasirAlva");
             event.target.value = "";
             return;
@@ -3146,11 +3167,13 @@
             event.target.value = "";
             return;
           }
-          products = data.products;
+          products = productList;
           transactions = Array.isArray(data.transactions) ? data.transactions : [];
-          opnames = Array.isArray(data.opnames) ? data.opnames : [];
+          opnames = Array.isArray(data.opnames) ? data.opnames : (Array.isArray(data.stockOpname) ? data.stockOpname : []);
           if (data.store && typeof data.store === "object") {
             storeSettings = { ...storeSettings, ...data.store };
+          } else if (data.storeSettings && typeof data.storeSettings === "object") {
+            storeSettings = { ...storeSettings, ...data.storeSettings };
           }
           saveState();
           applyStoreSettings();
@@ -3160,8 +3183,10 @@
           renderCart();
           updateLowStockAlert();
           if (typeof renderOpnames === "function") renderOpnames();
-          showToast("Data berhasil dipulihkan. Silakan buka ulang menu bila perlu.");
+          if (typeof renderInventory === "function") renderInventory();
+          showToast("Data berhasil dipulihkan.");
         } catch (err) {
+          console.error(err);
           showToast("Gagal membaca file backup");
         }
         event.target.value = "";

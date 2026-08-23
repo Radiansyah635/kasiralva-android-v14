@@ -5,12 +5,14 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import android.print.PrintAttributes
 import android.print.PrintManager
 import android.webkit.JavascriptInterface
 import android.webkit.PermissionRequest
+import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
@@ -38,6 +40,9 @@ class MainActivity : ComponentActivity() {
     // hasil dialog izin kamera Android.
     private var pendingWebPermissionRequest: PermissionRequest? = null
 
+    // File chooser untuk <input type="file"> di WebView (import JSON via HTML)
+    private var filePathCallback: ValueCallback<Array<Uri>>? = null
+
     private val requestCameraPermission = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
@@ -51,6 +56,25 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private val fileChooserLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val callback = filePathCallback
+        filePathCallback = null
+        if (callback == null) return@registerForActivityResult
+        val uris: Array<Uri>? = if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+            val data = result.data!!
+            when {
+                data.clipData != null && data.clipData!!.itemCount > 0 -> {
+                    Array(data.clipData!!.itemCount) { i -> data.clipData!!.getItemAt(i).uri }
+                }
+                data.data != null -> arrayOf(data.data!!)
+                else -> null
+            }
+        } else null
+        callback.onReceiveValue(uris)
+    }
+
     private fun hasCameraPermission(): Boolean =
         ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) ==
             PackageManager.PERMISSION_GRANTED
@@ -62,6 +86,7 @@ class MainActivity : ComponentActivity() {
             settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
             settings.allowFileAccess = true
+            settings.allowContentAccess = true
             settings.cacheMode = WebSettings.LOAD_DEFAULT
             settings.mediaPlaybackRequiresUserGesture = false
             webViewClient = WebViewClient()
@@ -74,6 +99,34 @@ class MainActivity : ComponentActivity() {
                             pendingWebPermissionRequest = request
                             requestCameraPermission.launch(Manifest.permission.CAMERA)
                         }
+                    }
+                }
+
+                override fun onShowFileChooser(
+                    webView: WebView?,
+                    filePathCallback: ValueCallback<Array<Uri>>?,
+                    fileChooserParams: FileChooserParams?
+                ): Boolean {
+                    // Batalkan callback lama kalau ada (user buka file picker berulang)
+                    this@MainActivity.filePathCallback?.onReceiveValue(null)
+                    this@MainActivity.filePathCallback = filePathCallback
+                    return try {
+                        val intent = fileChooserParams?.createIntent()
+                            ?: Intent(Intent.ACTION_GET_CONTENT).apply {
+                                addCategory(Intent.CATEGORY_OPENABLE)
+                                type = "*/*"
+                            }
+                        fileChooserLauncher.launch(intent)
+                        true
+                    } catch (e: Exception) {
+                        this@MainActivity.filePathCallback = null
+                        filePathCallback?.onReceiveValue(null)
+                        Toast.makeText(
+                            this@MainActivity,
+                            "Tidak bisa membuka pemilih file: ${e.message}",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        false
                     }
                 }
             }
